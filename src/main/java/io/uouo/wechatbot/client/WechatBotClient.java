@@ -94,12 +94,9 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 
             //有人@骰娘了
             if (rContent.contains("@骰娘")) {
-                if (false){
-
-                }
 
                 // @ 先看看是不是男桐
-                else if (rContent.contains("男桐指数")) {
+                if (rContent.contains("男桐指数")) {
                     Boolean isNt = false;
                     String ntName = "";
                     for (String s :
@@ -241,8 +238,8 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                 }
 
                 // @ 吃饭
-                else if (rContent.contains("吃什么")) {
-                    String result = "骰娘推荐恰:" + foodList.get(listRoll(foodList.size()));
+                else if (rContent.contains("吃什么") || rContent.contains("吃撒子")) {
+                    String result = "骰娘推荐恰：" + foodList.get(listRoll(foodList.size()));
                     WechatMsg wechatMsg = new WechatMsg();
                     wechatMsg.setWxid(wechatReceiveMsg.getWxid());
                     wechatMsg.setContent(result);
