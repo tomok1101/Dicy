@@ -206,6 +206,11 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                                     diceResult = "成功";
                                 }
                             }
+                            //豆豆柯基彩蛋
+//                            if (rContent.contains("豆豆柯基") || rContent.contains("周年")) {
+//                                diceResult = "金色传说级成功";
+//                                dice = 1;
+//                            }
                             String result = "进行" + event + "判定:\n";
                             result = result + "D100 = " + dice + "/" + point + " " + diceResult;
                             WechatMsg wechatMsg = new WechatMsg();
