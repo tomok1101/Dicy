@@ -86,22 +86,24 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 
         //骰娘拿到消息
         WechatReceiveMsg wechatReceiveMsg = (WechatReceiveMsg) JSONObject.parseObject(msg, WechatReceiveMsg.class);
-        if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType())) {
-            System.out.println("微信中收到了消息:" + msg);
-            String rContent = wechatReceiveMsg.getContent();
-            rContent = rContent.replace(" ", "");
+        if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) || wechatReceiveMsg.getWxid() == null) {
+//            if (wechatReceiveMsg.getWxid() != null){
+//                if (wechatReceiveMsg.getWxid().equals("18929140647@chatroom")){
+//                    return;
+//                }
+//            }
 
+//            System.out.println("微信中收到了消息:" + msg);
+            String rContent = wechatReceiveMsg.getContent();
 
             //有人@骰娘了
             if (rContent.contains("@骰娘")) {
-                if (false){
-
-                }
-
+                rContent = rContent.replace(" ", "");
                 // @ 先看看是不是男桐
-                else if (rContent.contains("男桐指数")) {
+                if (rContent.contains("男桐指数")) {
                     Boolean isNt = false;
                     String ntName = "";
+                    //在男桐列表吗
                     for (String s :
                             nantongList) {
                         if (rContent.contains(s)) {
@@ -110,7 +112,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                             break;
                         }
                     }
-                    //在男桐名单
+                    //在
                     if (isNt) {
                         //骰子模块
                         try {
@@ -165,9 +167,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                         wechatMsg.setContent("哪里有秋秋？？秋秋辣妹！！[玫瑰][玫瑰][玫瑰]");
                         wechatMsg.setType(TXT_MSG);
                         sendMsgUtil(wechatMsg);
-
                     }
-//
                 }
 
                 // @ .rc丢骰子
@@ -206,11 +206,10 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                                     diceResult = "成功";
                                 }
                             }
-                            //豆豆柯基彩蛋
-//                            if (rContent.contains("豆豆柯基") || rContent.contains("周年")) {
-//                                diceResult = "金色传说级成功";
-//                                dice = 1;
-//                            }
+                            if (rContent.contains("蜜糖")){
+                                diceResult = "蜜糖级成功";
+                                dice = 1;
+                            }
                             String result = "进行" + event + "判定:\n";
                             result = result + "D100 = " + dice + "/" + point + " " + diceResult;
                             WechatMsg wechatMsg = new WechatMsg();
@@ -246,8 +245,8 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                 }
 
                 // @ 吃饭
-                else if (rContent.contains("吃什么")) {
-                    String result = "骰娘推荐恰:" + foodList.get(listRoll(foodList.size()));
+                else if (rContent.contains("吃什么") || rContent.contains("吃撒子")) {
+                    String result = "骰娘推荐恰：" + foodList.get(listRoll(foodList.size()));
                     WechatMsg wechatMsg = new WechatMsg();
                     wechatMsg.setWxid(wechatReceiveMsg.getWxid());
                     wechatMsg.setContent(result);
@@ -285,19 +284,19 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                             }
                     }
                 }
-
-
             }
 
 
             //群主的任务罢了1.0
-            else if (wechatReceiveMsg.getWxid().equals("wxid_e8rr05qphvq221")) {
-                String mission = wechatReceiveMsg.getContent();
-                WechatMsg wechatMsg = new WechatMsg();
-                wechatMsg.setWxid("18929140647@chatroom");
-                wechatMsg.setContent(mission);
-                wechatMsg.setType(TXT_MSG);
-                sendMsgUtil(wechatMsg);
+            else if (wechatReceiveMsg.getWxid() != null){
+                if (wechatReceiveMsg.getWxid().equals("wxid_e8rr05qphvq221")) {
+                    String mission = wechatReceiveMsg.getContent();
+                    WechatMsg wechatMsg = new WechatMsg();
+                    wechatMsg.setWxid("18929140647@chatroom");
+                    wechatMsg.setContent(mission);
+                    wechatMsg.setType(TXT_MSG);
+                    sendMsgUtil(wechatMsg);
+                }
             }
         }
     }
