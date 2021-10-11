@@ -1,3 +1,11 @@
+# 数据库地址
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://8.131.79.117:3306/dicy?useUnicode=true&characterEncoding=utf8&useSSL=false
+
 # tomcat接口地址访问地址
 server:
   port: 8081
@@ -6,7 +14,6 @@ server:
 # 连接到webSocket 连接地址
 wechatBot:
   url: ws://localhost:5555
-
 
 
 # 微信消息处理地址(将消息发送给指定接口)
@@ -20,5 +27,7 @@ wechatBotServer:
 # 日志配置
 logging:
   level:
+    root: info
     io.uouo: debug
     org.springframework: warn
+
