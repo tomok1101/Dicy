@@ -7,8 +7,8 @@ import io.uouo.wechatbot.common.WechatBotCommon;
 import io.uouo.wechatbot.common.WechatBotConfig;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
-import io.uouo.wechatbot.service.ShakeService;
-import io.uouo.wechatbot.service.UserService;
+import io.uouo.wechatbot.entity.Activity;
+import io.uouo.wechatbot.service.*;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,12 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
     private UserService userService;
     @Autowired
     private ShakeService shakeService;
+    @Autowired
+    private GameService gameService;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private FoodService foodService;
 
 
     /**
@@ -94,13 +100,14 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
         //骰娘拿到消息
         WechatReceiveMsg wechatReceiveMsg = (WechatReceiveMsg) JSONObject.parseObject(msg, WechatReceiveMsg.class);
         if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
-            if (wechatReceiveMsg.getWxid() != null){
-                if (wechatReceiveMsg.getWxid().equals("18929140647@chatroom")){
-                    return;
-                }
-            }
+            //闭群
+//            if (wechatReceiveMsg.getWxid() != null){
+//                if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")){
+//                    return;
+//                }
+//            }
+//            System.out.println("微信中收到了消息:" + msg);
 
-            System.out.println("微信中收到了消息:" + msg);
             String rContent = wechatReceiveMsg.getContent();
 
             //有人@骰娘了
@@ -238,14 +245,17 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 
                 // @ 抽签
                 else if (rContent.contains("抽签")) {
-                    int chouQianNum = listRoll(chouQianList.size());
-                    int chouQianNumNum = listRoll(chouQianList.size());
+                    int rNum = activityService.countAll();
+                    int chouQianNum = listRoll(rNum);
+                    int chouQianNumNum = listRoll(rNum);
                     while (chouQianNum == chouQianNumNum) {
-                        chouQianNumNum = listRoll(chouQianList.size());
+                        chouQianNumNum = listRoll(rNum);
                     }
+                    Activity activity = activityService.selectByid(chouQianNum);
+                    Activity activity1 = activityService.selectByid(chouQianNumNum);
                     String result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
-                            " 宜：" + chouQianList.get(chouQianNum) + "、" + chouQianList.get(chouQianNumNum) + "\n" +
-                            "今日有缘游戏：《" + gameList.get(listRoll(gameList.size())) + "》来，试试看吧！";
+                            " 宜：" + activityService.selectByid(chouQianNum).getActivity() + "、" + activityService.selectByid(chouQianNumNum).getActivity() + "\n" +
+                            "今日有缘游戏：《" + gameService.selectByid(listRoll(gameService.countAll())).getGame() + "》来，试试看吧！";
                     WechatMsg wechatMsg = new WechatMsg();
                     wechatMsg.setWxid(wechatReceiveMsg.getWxid());
                     wechatMsg.setContent(result);
@@ -256,7 +266,13 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 
                 // @ 吃饭
                 else if (rContent.contains("吃什么") || rContent.contains("吃撒子")) {
-                    String result = "骰娘推荐恰：" + foodList.get(listRoll(foodList.size()));
+                    String result = "";
+                    if (listRoll(10) > 5){
+                        result = foodList.get(listRoll(foodList.size()-1));
+                    }else {
+                        result = "骰娘推荐恰：" + foodService.selectByid(listRoll(foodService.countAll())).getFood();
+                    }
+
                     WechatMsg wechatMsg = new WechatMsg();
                     wechatMsg.setWxid(wechatReceiveMsg.getWxid());
                     wechatMsg.setContent(result);
@@ -397,7 +413,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
     }
 
     private int listRoll(int i) {
-        int dice = (int) (Math.random() * i);
+        int dice = (int) (Math.random() * i +1);
         return dice;
     }
 
@@ -410,52 +426,43 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
     );
 
     //DLC 抽签事项.群主
-    private static List<String> chouQianList = Arrays.asList(
-            "打游戏", "玩桌游", "买游戏", "搞男酮", "吃炒饭",
-            "吃火锅", "吃烧烤", "吃肥宅快乐餐", "吃甜食", "喝酒",
-            "聚会", "上班摸鱼", "请假在家", "带薪拉屎", "上班聊微信",
-            "调戏骰娘", "出警emo", "出警二郎腿", "运动", "冲动消费",
-            "淘宝购物", "吸猫吸狗", "谈恋爱", "联系旧友", "买彩票",
-            "参与抽奖"
-    );
+//    private static List<String> chouQianList = Arrays.asList(
+//            "打游戏", "玩桌游", "买游戏", "搞男酮", "吃炒饭",
+//            "吃火锅", "吃烧烤", "吃肥宅快乐餐", "吃甜食", "喝酒",
+//            "聚会", "上班摸鱼", "请假在家", "带薪拉屎", "上班聊微信",
+//            "调戏骰娘", "出警emo", "出警二郎腿", "运动", "冲动消费",
+//            "淘宝购物", "吸猫吸狗", "谈恋爱", "联系旧友", "买彩票",
+//            "参与抽奖"
+//    );
 
     //DLC 抽签游戏.群主
-    private static List<String> gameList = Arrays.asList(
-            "英雄联盟", "只狼", "黑暗之魂3", "仁王", "血源",
-            "女神异闻录5", "饥荒", "缺氧", "异星探险家", "无人深空",
-            "Grounded", "恐鬼症", "文明6", "巫师3", "死亡搁浅",
-            "极乐迪斯科", "以撒的结合", "空洞骑士", "DOTA2", "动物园之星",
-            "牧场物语", "动物森友会", "火焰纹章", "宝可梦", "猎天使魔女2",
-            "地平线4", "风来之国", "如龙", "审判之眼", "炉石传说", "塞尔达传说",
-            "生化危机", "怪物猎人", "双人成行", "你画我猜", "节奏医生", "超级马力欧创作家2",
-            "糖豆人", "荒野大镖客", "胡闹厨房", "戴森球计划", "黑帝斯", "对马岛之魂", "最终幻想",
-            "ORI", "十三机兵防卫圈", "天外世界", "健身环大冒险", "异度神剑", "勇者斗恶龙", "命运",
-            "无主之地", "魔兽世界", "鬼泣", "地铁", "逆转裁判", "任天堂明星大乱斗", "古剑奇谭",
-            "奥伯拉丁的回归", "杀戮尖塔", "艾迪芬奇的记忆", "神界原罪2", "锈湖系列", "死亡细胞", "八方旅人",
-            "密教模拟器", "战神", "底特律：成为人类", "蔚蓝", "刺客信条", "茶杯头", "心跳文学部", "奇异人生",
-            "柴堆", "巧克力与香子兰", "小小梦魇", "逃生", "异域镇魂曲", "博德之门", "泰坦天降2", "生化奇兵",
-            "赛博朋克酒保行动", "赛博朋克2077", "弹丸论破", "彩虹六号", "晶体管","博德之门", "给他爱5", "最后生还者"
-    );
+//    private static List<String> gameList = Arrays.asList(
+//            "英雄联盟", "只狼", "黑暗之魂3", "仁王", "血源",
+//            "女神异闻录5", "饥荒", "缺氧", "异星探险家", "无人深空",
+//            "Grounded", "恐鬼症", "文明6", "巫师3", "死亡搁浅",
+//            "极乐迪斯科", "以撒的结合", "空洞骑士", "DOTA2", "动物园之星",
+//            "牧场物语", "动物森友会", "火焰纹章", "宝可梦", "猎天使魔女2",
+//            "地平线4", "风来之国", "如龙", "审判之眼", "炉石传说", "塞尔达传说",
+//            "生化危机", "怪物猎人", "双人成行", "你画我猜", "节奏医生", "超级马力欧创作家2",
+//            "糖豆人", "荒野大镖客", "胡闹厨房", "戴森球计划", "黑帝斯", "对马岛之魂", "最终幻想",
+//            "ORI", "十三机兵防卫圈", "天外世界", "健身环大冒险", "异度神剑", "勇者斗恶龙", "命运",
+//            "无主之地", "魔兽世界", "鬼泣", "地铁", "逆转裁判", "任天堂明星大乱斗", "古剑奇谭",
+//            "奥伯拉丁的回归", "杀戮尖塔", "艾迪芬奇的记忆", "神界原罪2", "锈湖系列", "死亡细胞", "八方旅人",
+//            "密教模拟器", "战神", "底特律：成为人类", "蔚蓝", "刺客信条", "茶杯头", "心跳文学部", "奇异人生",
+//            "柴堆", "巧克力与香子兰", "小小梦魇", "逃生", "异域镇魂曲", "博德之门", "泰坦天降2", "生化奇兵",
+//            "赛博朋克酒保行动", "赛博朋克2077", "弹丸论破", "彩虹六号", "晶体管","博德之门", "给他爱5", "最后生还者"
+//    );
 
-    //DLC 吃什么.董董
+    //DLC 吃什么.plus
     private static List<String> foodList = Arrays.asList(
-            "扬州炒饭", "蛋炒饭", "猪脚饭", "盖浇饭", "铜锅洋芋饭",
-            "鸡汤饭", "烧烤炒饭", "稀饭", "蛋包饭", "咖喱饭",
-            "烧鹅饭", "卤肉饭", "蟹黄拌饭", "剁椒拌饭", "木桶饭",
-            "猪肝面", "豌杂面", "清汤面", "双绍面", "姜鸭面", "宜宾燃面",
-            "鸡杂面", "炒面", "凉面", "牛筋面", "担担面", "钟水饺", "海鲜馄饨",
-            "蒸饺", "小笼包", "灌汤包", "老麻抄手", "烤包子", "酱香饼", "葱油饼",
-            "生煎", "凉皮", "锅盔", "肉夹馍", "荤豆花", "驴肉火烧", "凉拌鸡片",
-            "西红柿炒蛋", "青椒肉丝", "翘脚牛肉", "芋儿烧鸡", "红烧肘子", "回锅肉",
-            "性感口水鸡", "黄焖鸡", "锅包又", "酸菜鱼", "手撕鸡", "鸡公煲", "大盘鸡",
-            "冰粉", "凉糕", "凉虾", "烤红薯", "炒板栗", "臭豆腐", "乐山豆腐脑", "豆浆油条",
-            "醪糟汤圆", "豆汁儿", "烤冷面", "苕皮豆干", "脆皮五花肉", "鸭血粉丝汤", "过桥米线",
-            "花甲米线", "螺蛳粉", "肥肠粉", "酸辣粉", "绵阳米粉", "炒河粉", "花溪米粉", "南充米粉",
-            "酸辣土豆粉", "中秋节公司发的月饼", "披萨", "意面", "炸鸡", "麻辣鸡架", "冒菜", "火锅",
-            "干锅", "烤鸭", "寿司", "金拱门", "开封菜", "自助餐", "面包", "现捞", "油炸串串", "烧烤",
-            "烤肉", "东百菜", "全家便当", "沙县小吃", "华莱士", "嫩牛五方", "牛排", "老妈蹄花", "轻食沙拉",
-            "鲜锅兔", "马路边民工套餐", "乐山钵钵鸡", "炸洋芋", "冷面", "西北风", "屁！！", "汉堡王", "煲仔饭","加急名单的枪子"
-    );
+            "可乐饼啦可乐饼！骰娘可以吃一盘！", "骰娘倾情推荐的拔丝地瓜！炸得酥脆，享用时蘸点糖浆更好吃。", "大西瓜！又甜又脆的冰镇大西瓜！真的会有人夏天不吃西瓜吗～", "是好吃的生煎……骰娘做梦梦到的生煎……", "来一碗粘稠又香浓的碗仔翅。",
+            "理智应合剂功能饮料，将脑海中沉余杂质一扫而空！买不到可以用大瓶芥末替代，效果更加好！", "柔软膨松的舒芙蕾~骰娘我也很喜欢。", "柔情似蜜甜甜圈，爱的魔力转圈圈。", "香烤全鸡！好吃到骰娘流泪！整只火鸡放进烤箱做成的料理，有它立刻变大餐～", "牛肉乌冬面，精心烹饪的牛肉乌冬面，是骰娘十公里之外就能闻到的香气！",
+            "炎热夏天带来凉爽口感的芒果绵绵牛奶冰，芒果的甜和牛奶冰的脆爽混合得恰到好处～", "湿润浓郁的鲷鱼烧，口感松软又富有弹性，是暖暖的红豆馅哦～", "椰子鸡怎么样，椰子鸡", "表面酥脆的菠萝油，刚出炉的热气合上中间夹着冰冻的黄油，冷与热，甜与咸，感受冰火两重天的美味。", "色泽金黄明亮，香气诱人，多少碗饭都吃得下，就选骰娘咖喱！",
+            "嗦螺蛳粉，十分美味，十二分回味，够爽，够辣，够实惠！", "路边糖水铺买的杨枝甘露，骰娘吃完感觉整只鸽子都快乐了～", "色泽金黄明亮，香气诱人，多少碗饭都吃得下，就选骰娘咖喱！","小巷子口的鸭血粉丝汤，都说了不要放辣油啦！","骰娘倾情推荐的拔丝地瓜！炸得酥脆，享用时蘸点糖浆更好吃。",
+            "干炒牛河！好吃到骰娘打嗝！","炸鸡块和柠檬汁，骰娘说反正我是只骰子这有什么不可以吃的～","来碗热腾腾的烧鹅濑，烧鹅皮脆肉嫩，汤汁鲜美，务必要尝尝哦。","芝士牛丼饭，软硬适中的牛肉上盖满了上品芝士。","让人想爆灯的美味烧鹅饭，路过的喜鹊吃到都要落泪了。"
+
+
+            );
 
 
     /**

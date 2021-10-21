@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     public void sayMyaName(String wxid, String nickname) {
         User user = userMapper.selectOne(new QueryWrapper<User>().eq("wxid",wxid));
         if (user == null){
-            userMapper.insert(new User(wxid,nickname,null));
+            userMapper.insert(new User(null,wxid,nickname,null));
         }else {
             UpdateWrapper<User> updateWrapper = new UpdateWrapper<User>();
             updateWrapper.eq("wxid",user.getWxid()).set("nickname", nickname);
