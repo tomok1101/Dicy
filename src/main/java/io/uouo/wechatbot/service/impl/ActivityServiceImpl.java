@@ -36,4 +36,9 @@ public class ActivityServiceImpl implements ActivityService {
     public List<Activity> list() {
         return activityMapper.selectList(null);
     }
+
+    @Override
+    public void delete(int no) {
+        activityMapper.deleteById(no);
+    }
 }

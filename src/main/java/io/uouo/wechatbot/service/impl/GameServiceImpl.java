@@ -43,4 +43,9 @@ public class GameServiceImpl implements GameService {
     public List<Game> list() {
         return gameMapper.selectList(null);
     }
+
+    @Override
+    public void delete(int no) {
+        gameMapper.deleteById(no);
+    }
 }

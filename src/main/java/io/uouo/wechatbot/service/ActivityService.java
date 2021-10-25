@@ -20,4 +20,7 @@ public interface ActivityService {
 
     //列表
     List<Activity> list();
+
+    //删除
+    void delete(int no);
 }

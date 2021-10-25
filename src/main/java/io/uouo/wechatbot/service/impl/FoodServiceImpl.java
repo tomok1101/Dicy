@@ -43,4 +43,9 @@ public class FoodServiceImpl implements FoodService {
     public List<Food> list() {
         return foodMapper.selectList(null);
     }
+
+    @Override
+    public void delete(int no) {
+        foodMapper.deleteById(no);
+    }
 }

@@ -20,4 +20,7 @@ public interface FoodService {
 
     //列表
     List<Food> list();
+
+    //删除
+    void delete(int no);
 }

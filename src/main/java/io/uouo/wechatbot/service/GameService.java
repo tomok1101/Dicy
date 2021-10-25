@@ -19,4 +19,7 @@ public interface GameService {
 
     //列表
     List<Game> list();
+
+    //删除
+    void delete(int no);
 }
