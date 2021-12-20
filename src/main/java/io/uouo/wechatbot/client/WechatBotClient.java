@@ -161,32 +161,32 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                 }
 
                 // @ 有没有炒饭元素
-                else if (rContent.contains("秋秋")) {
-                    if (rContent.contains("饿了")) {
-                        List<String> exChaofan = Arrays.asList(
-                                "史诗", "绝版", "联名", "食堂",
-                                "芒果现炒", "男桐", "群主现炒");
-                        List<String> midChaofan = Arrays.asList(
-                                "蛋", "拔十圆", "饭", "咖喱",
-                                "胡萝卜蛋", "咸鸭蛋", "虾球鸡肉丁", "韩国泡菜", "扬州");
-                        String chaofan = exChaofan.get((int) (Math.random() * exChaofan.size())) +
-                                midChaofan.get((int) (Math.random() * midChaofan.size())) +
-                                "炒饭！！！";
-                        WechatMsg wechatMsg = new WechatMsg();
-                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-                        wechatMsg.setContent(chaofan);
-                        wechatMsg.setType(TXT_MSG);
-                        sendMsgUtil(wechatMsg);
-                        return;
-                    } else {
-                        WechatMsg wechatMsg = new WechatMsg();
-                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-                        wechatMsg.setContent("哪里有秋秋？？秋秋辣妹！！[玫瑰][玫瑰][玫瑰]");
-                        wechatMsg.setType(TXT_MSG);
-                        sendMsgUtil(wechatMsg);
-                        return;
-                    }
-                }
+//                else if (rContent.contains("秋秋")) {
+//                    if (rContent.contains("饿了")) {
+//                        List<String> exChaofan = Arrays.asList(
+//                                "史诗", "绝版", "联名", "食堂",
+//                                "芒果现炒", "男桐", "群主现炒");
+//                        List<String> midChaofan = Arrays.asList(
+//                                "蛋", "拔十圆", "饭", "咖喱",
+//                                "胡萝卜蛋", "咸鸭蛋", "虾球鸡肉丁", "韩国泡菜", "扬州");
+//                        String chaofan = exChaofan.get((int) (Math.random() * exChaofan.size())) +
+//                                midChaofan.get((int) (Math.random() * midChaofan.size())) +
+//                                "炒饭！！！";
+//                        WechatMsg wechatMsg = new WechatMsg();
+//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+//                        wechatMsg.setContent(chaofan);
+//                        wechatMsg.setType(TXT_MSG);
+//                        sendMsgUtil(wechatMsg);
+//                        return;
+//                    } else {
+//                        WechatMsg wechatMsg = new WechatMsg();
+//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+//                        wechatMsg.setContent("哪里有秋秋？？秋秋辣妹！！[玫瑰][玫瑰][玫瑰]");
+//                        wechatMsg.setType(TXT_MSG);
+//                        sendMsgUtil(wechatMsg);
+//                        return;
+//                    }
+//                }
 
                 // @ .rc丢骰子
                 else if (rContent.contains(".rc")) {
@@ -225,10 +225,10 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                                 }
                             }
                             //蜜糖彩蛋
-                            if (rContent.contains("蜜糖")){
-                                diceResult = "蜜糖级成功";
-                                dice = 1;
-                            }
+//                            if (rContent.contains("蜜糖")){
+//                                diceResult = "蜜糖级成功";
+//                                dice = 1;
+//                            }
                             String result = "进行" + event + "判定:\n";
                             result = result + "D100 = " + dice + "/" + point + " " + diceResult;
                             WechatMsg wechatMsg = new WechatMsg();
