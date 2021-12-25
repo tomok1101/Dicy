@@ -1,7 +1,6 @@
 package io.uouo.wechatbot.service;
 
 import io.uouo.wechatbot.entity.Activity;
-import io.uouo.wechatbot.entity.Game;
 
 import java.util.List;
 

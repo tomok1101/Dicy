@@ -282,47 +282,47 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                 }
 
                 // @ 记住这个人
-                else if (rContent.contains("我是")) {
-                    if (rContent.contains("爸") || rContent.contains("爹")||rContent.contains("father")||rContent.contains("dad")){
-                        String result = "你是猪";
-                        WechatMsg wechatMsg = new WechatMsg();
-                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-                        wechatMsg.setContent(result);
-                        wechatMsg.setType(TXT_MSG);
-                        sendMsgUtil(wechatMsg);
-                        return;
-                    }
-                    String[] results = rContent.split("我是");
-                    String nickname = results[1];
-                    String wxid = wechatReceiveMsg.getId1();
-                    userService.sayMyaName(wxid,nickname);
-                    String result = nickname + "你好！";
-                    WechatMsg wechatMsg = new WechatMsg();
-                    wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-                    wechatMsg.setContent(result);
-                    wechatMsg.setType(TXT_MSG);
-                    sendMsgUtil(wechatMsg);
-                    return;
-                }
+//                else if (rContent.contains("我是")) {
+//                    if (rContent.contains("爸") || rContent.contains("爹")||rContent.contains("father")||rContent.contains("dad")){
+//                        String result = "你是猪";
+//                        WechatMsg wechatMsg = new WechatMsg();
+//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+//                        wechatMsg.setContent(result);
+//                        wechatMsg.setType(TXT_MSG);
+//                        sendMsgUtil(wechatMsg);
+//                        return;
+//                    }
+//                    String[] results = rContent.split("我是");
+//                    String nickname = results[1];
+//                    String wxid = wechatReceiveMsg.getId1();
+//                    userService.sayMyaName(wxid,nickname);
+//                    String result = nickname + "你好！";
+//                    WechatMsg wechatMsg = new WechatMsg();
+//                    wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+//                    wechatMsg.setContent(result);
+//                    wechatMsg.setType(TXT_MSG);
+//                    sendMsgUtil(wechatMsg);
+//                    return;
+//                }
 
                 // @ 发车
-                else if (rContent.contains(".fc")) {
-                    try {
-                        String[] results = rContent.split(" ");
-                        String game = results[1];
-                        Integer num = Integer.valueOf(results[2].replace("天",""));
-                        shakeService.shake(game,num,7);
-
-                        String result = "骰娘已记录";
-                        WechatMsg wechatMsg = new WechatMsg();
-                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-                        wechatMsg.setContent(result);
-                        wechatMsg.setType(TXT_MSG);
-                        sendMsgUtil(wechatMsg);
-                    } catch (Exception e) {
-                        System.out.println(e);
-                    }
-                }
+//                else if (rContent.contains(".fc")) {
+//                    try {
+//                        String[] results = rContent.split(" ");
+//                        String game = results[1];
+//                        Integer num = Integer.valueOf(results[2].replace("天",""));
+//                        shakeService.shake(game,num,7);
+//
+//                        String result = "骰娘已记录";
+//                        WechatMsg wechatMsg = new WechatMsg();
+//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+//                        wechatMsg.setContent(result);
+//                        wechatMsg.setType(TXT_MSG);
+//                        sendMsgUtil(wechatMsg);
+//                    } catch (Exception e) {
+//                        System.out.println(e);
+//                    }
+//                }
 
                 // @ 上车
 //                else if (rContent.contains(".sc")) {
@@ -362,6 +362,18 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 //                        System.out.println(e);
 //                    }
 //                }
+
+                // @ 圣诞快乐
+                else if (rContent.contains("圣诞快乐")) {
+                    String result = "";
+
+                    WechatMsg wechatMsg = new WechatMsg();
+                    wechatMsg.setWxid(wechatReceiveMsg.getWxid());
+                    wechatMsg.setContent(result);
+                    wechatMsg.setType(TXT_MSG);
+                    sendMsgUtil(wechatMsg);
+                    return;
+                }
 
 
                 // @ 普通的丢骰子
