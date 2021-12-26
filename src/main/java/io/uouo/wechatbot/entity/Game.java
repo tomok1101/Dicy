@@ -7,14 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("user")
-public class User {
+@TableName("game")
+public class Game {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
-    private String wxid;
-    private String nickname;
-    private String roomid;
+    private String game;
 }
