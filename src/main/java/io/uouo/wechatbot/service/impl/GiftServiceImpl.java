@@ -16,9 +16,7 @@ public class GiftServiceImpl implements GiftService {
 
 
     @Override
-    public int countAll() {
-        return giftMapper.selectCount(null);
+    public void save(String gift) {
+
     }
-
-
 }

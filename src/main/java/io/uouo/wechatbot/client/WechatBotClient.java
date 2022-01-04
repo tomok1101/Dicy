@@ -538,7 +538,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
         wechatMsg.setId(String.valueOf(System.currentTimeMillis()));
         // 发送消息
         String string = JSONObject.toJSONString(wechatMsg);
-        System.err.println(":" + string);
+//        System.err.println(":" + string);
         send(JSONObject.toJSONString(wechatMsg));
     }
 }
