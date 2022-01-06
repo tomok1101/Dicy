@@ -36,12 +36,11 @@ import java.util.concurrent.TimeUnit;
  * @Description: < 描述 >
  */
 public class WechatBotClient extends WebSocketClient implements WechatBotCommon {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ShakeService shakeService;
+
     @Autowired
     private GameService gameService;
+    @Autowired
+    private GiftService giftService;
     @Autowired
     private ActivityService activityService;
     @Autowired
@@ -106,7 +105,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 //                    return;
 //                }
 //            }
-//            System.out.println("微信中收到了消息:" + msg);
+            System.out.println("微信中收到了消息:" + msg);
 
             String rContent = wechatReceiveMsg.getContent();
 
@@ -224,11 +223,6 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                                     diceResult = "成功";
                                 }
                             }
-                            //蜜糖彩蛋
-//                            if (rContent.contains("蜜糖")){
-//                                diceResult = "蜜糖级成功";
-//                                dice = 1;
-//                            }
                             String result = "进行" + event + "判定:\n";
                             result = result + "D100 = " + dice + "/" + point + " " + diceResult;
                             WechatMsg wechatMsg = new WechatMsg();
@@ -280,93 +274,26 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
                     sendMsgUtil(wechatMsg);
                     return;
                 }
-
-                // @ 记住这个人
-//                else if (rContent.contains("我是")) {
-//                    if (rContent.contains("爸") || rContent.contains("爹")||rContent.contains("father")||rContent.contains("dad")){
-//                        String result = "你是猪";
-//                        WechatMsg wechatMsg = new WechatMsg();
-//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-//                        wechatMsg.setContent(result);
-//                        wechatMsg.setType(TXT_MSG);
-//                        sendMsgUtil(wechatMsg);
-//                        return;
-//                    }
-//                    String[] results = rContent.split("我是");
-//                    String nickname = results[1];
-//                    String wxid = wechatReceiveMsg.getId1();
-//                    userService.sayMyaName(wxid,nickname);
-//                    String result = nickname + "你好！";
-//                    WechatMsg wechatMsg = new WechatMsg();
-//                    wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-//                    wechatMsg.setContent(result);
-//                    wechatMsg.setType(TXT_MSG);
-//                    sendMsgUtil(wechatMsg);
-//                    return;
-//                }
-
-                // @ 发车
-//                else if (rContent.contains(".fc")) {
-//                    try {
-//                        String[] results = rContent.split(" ");
-//                        String game = results[1];
-//                        Integer num = Integer.valueOf(results[2].replace("天",""));
-//                        shakeService.shake(game,num,7);
-//
-//                        String result = "骰娘已记录";
-//                        WechatMsg wechatMsg = new WechatMsg();
-//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-//                        wechatMsg.setContent(result);
-//                        wechatMsg.setType(TXT_MSG);
-//                        sendMsgUtil(wechatMsg);
-//                    } catch (Exception e) {
-//                        System.out.println(e);
-//                    }
-//                }
-
-                // @ 上车
-//                else if (rContent.contains(".sc")) {
-//                    try {
-//                        String[] results = rContent.split(" ");
-//                        String game = results[1];
-//                        Integer num = Integer.valueOf(results[2].replace("天",""));
-//                        shakeService.shake(game,num,7);
-//
-//                        String result = "骰娘已记录";
-//                        WechatMsg wechatMsg = new WechatMsg();
-//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-//                        wechatMsg.setContent(result);
-//                        wechatMsg.setType(TXT_MSG);
-//                        sendMsgUtil(wechatMsg);
-//                    } catch (Exception e) {
-//                        System.out.println(e);
-//                    }
-//                }
-
-
-                // @ 查车
-//                else if (rContent.contains(".cc")) {
-//                    try {
-//                        String[] results = rContent.split(" ");
-//                        String game = results[1];
-//                        Integer num = Integer.valueOf(results[2].replace("天",""));
-//                        shakeService.shake(game,num,7);
-//
-//                        String result = "骰娘已记录";
-//                        WechatMsg wechatMsg = new WechatMsg();
-//                        wechatMsg.setWxid(wechatReceiveMsg.getWxid());
-//                        wechatMsg.setContent(result);
-//                        wechatMsg.setType(TXT_MSG);
-//                        sendMsgUtil(wechatMsg);
-//                    } catch (Exception e) {
-//                        System.out.println(e);
-//                    }
-//                }
-
+                // @ 圣诞快乐
+                else if (rContent.contains("重抽")) {
+                    giftService.put();
+                    return;
+                }
+                else if (rContent.contains("del")) {
+                    String del = rContent.replace("@骰娘del", "");
+                    giftService.del(del);
+                    return;
+                }
+                else if (rContent.contains("add")) {
+                    String add = rContent.replace("@骰娘add", "");
+                    giftService.add(add);
+                    return;
+                }
                 // @ 圣诞快乐
                 else if (rContent.contains("圣诞快乐")) {
                     String result = "";
-
+                    String gift = giftService.get(wechatReceiveMsg.getId1());
+                    result = gift + "的圣诞礼物请收下~";
                     WechatMsg wechatMsg = new WechatMsg();
                     wechatMsg.setWxid(wechatReceiveMsg.getWxid());
                     wechatMsg.setContent(result);

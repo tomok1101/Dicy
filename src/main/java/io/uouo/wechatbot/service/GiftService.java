@@ -6,5 +6,12 @@ import java.util.List;
 
 public interface GiftService {
     //查询总数
-    void save(String gift);
+    void put();
+
+    String get(String wxid);
+
+    void add(String name);
+
+    void del(String name);
+
 }
