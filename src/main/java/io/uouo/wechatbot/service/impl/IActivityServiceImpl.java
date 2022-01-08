@@ -2,14 +2,14 @@ package io.uouo.wechatbot.service.impl;
 
 import io.uouo.wechatbot.entity.Activity;
 import io.uouo.wechatbot.mapper.ActivityMapper;
-import io.uouo.wechatbot.service.ActivityService;
+import io.uouo.wechatbot.service.IActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ActivityServiceImpl implements ActivityService {
+public class IActivityServiceImpl implements IActivityService {
     @Autowired
     private ActivityMapper activityMapper;
 

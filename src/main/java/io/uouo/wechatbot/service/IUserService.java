@@ -5,6 +5,6 @@ import io.uouo.wechatbot.entity.User;
 
 import java.util.List;
 
-public interface UserService {
+public interface IUserService {
     void sayMyaName(String wxid,String nickname);
 }

@@ -27,7 +27,7 @@ wechatBotServer:
 # 日志配置
 logging:
   level:
-    root: info
-    io.uouo: debug
+    root: error
+    io.uouo: error
     org.springframework: warn
 

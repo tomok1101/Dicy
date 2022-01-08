@@ -1,9 +1,8 @@
 package io.uouo.wechatbot.service.impl;
 
 import io.uouo.wechatbot.entity.Shake;
-import io.uouo.wechatbot.entity.Shakeman;
 import io.uouo.wechatbot.mapper.ShakeMapper;
-import io.uouo.wechatbot.service.ShakeService;
+import io.uouo.wechatbot.service.IShakeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Service
-public class ShakeServiceImpl implements ShakeService {
+public class IIShakeServiceImpl implements IShakeService {
     @Autowired
     private ShakeMapper shakeMapper;
 

@@ -2,7 +2,7 @@ package io.uouo.wechatbot.controller;
 
 import io.uouo.wechatbot.common.util.AjaxResult;
 import io.uouo.wechatbot.entity.Activity;
-import io.uouo.wechatbot.service.ActivityService;
+import io.uouo.wechatbot.service.IActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ActivityController {
 
     @Autowired
-    private ActivityService activityService;
+    private IActivityService IActivityService;
 
 
     /**
@@ -29,7 +29,7 @@ public class ActivityController {
      */
     @GetMapping("/list")
     public AjaxResult list() {
-        return new AjaxResult(200,"操作成功",activityService.list());
+        return new AjaxResult(200,"操作成功", IActivityService.list());
     }
 
 
@@ -43,7 +43,7 @@ public class ActivityController {
      */
     @PostMapping("/add")
     public AjaxResult add(String activity) {
-        activityService.add(activity);
+        IActivityService.add(activity);
         return AjaxResult.success();
     }
 
@@ -58,7 +58,7 @@ public class ActivityController {
     @PostMapping("/update")
     public AjaxResult update(@RequestBody Activity activity) {
         // 发送消息
-        activityService.update(activity);
+        IActivityService.update(activity);
         return AjaxResult.success();
     }
 

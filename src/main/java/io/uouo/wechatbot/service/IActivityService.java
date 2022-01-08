@@ -1,24 +1,24 @@
 package io.uouo.wechatbot.service;
 
-import io.uouo.wechatbot.entity.Food;
+import io.uouo.wechatbot.entity.Activity;
 
 import java.util.List;
 
-public interface FoodService {
+public interface IActivityService {
     //查询总数
     int countAll();
 
     //查询指定项
-    Food selectByid(int id);
+    Activity selectByid(int id);
 
     //增加
-    void add(String food);
+    void add(String activity);
 
     //修改
-    void update(Food food);
+    void update(Activity activity);
 
     //列表
-    List<Food> list();
+    List<Activity> list();
 
     //删除
     void delete(int no);

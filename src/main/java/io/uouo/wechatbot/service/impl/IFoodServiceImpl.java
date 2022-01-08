@@ -1,21 +1,15 @@
 package io.uouo.wechatbot.service.impl;
 
 import io.uouo.wechatbot.entity.Food;
-import io.uouo.wechatbot.entity.Game;
-import io.uouo.wechatbot.entity.Shake;
 import io.uouo.wechatbot.mapper.FoodMapper;
-import io.uouo.wechatbot.mapper.ShakeMapper;
-import io.uouo.wechatbot.service.FoodService;
-import io.uouo.wechatbot.service.ShakeService;
+import io.uouo.wechatbot.service.IFoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
-public class FoodServiceImpl implements FoodService {
+public class IFoodServiceImpl implements IFoodService {
     @Autowired
     private FoodMapper foodMapper;
 

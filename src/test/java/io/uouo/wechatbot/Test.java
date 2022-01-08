@@ -1,13 +1,9 @@
 package io.uouo.wechatbot;
 
-import io.uouo.wechatbot.entity.User;
 import io.uouo.wechatbot.mapper.GameMapper;
 import io.uouo.wechatbot.mapper.UserMapper;
-import io.uouo.wechatbot.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 public class Test {

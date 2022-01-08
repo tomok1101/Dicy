@@ -2,7 +2,7 @@ package io.uouo.wechatbot.controller;
 
 import io.uouo.wechatbot.common.util.AjaxResult;
 import io.uouo.wechatbot.entity.Game;
-import io.uouo.wechatbot.service.GameService;
+import io.uouo.wechatbot.service.IGameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class GameController {
 
     @Autowired
-    private GameService gameService;
+    private IGameService IGameService;
 
 
     /**
@@ -29,7 +29,7 @@ public class GameController {
      */
     @GetMapping("/list")
     public AjaxResult list() {
-        return new AjaxResult(200,"操作成功",gameService.list());
+        return new AjaxResult(200,"操作成功", IGameService.list());
     }
 
 
@@ -43,7 +43,7 @@ public class GameController {
      */
     @PostMapping("/add")
     public AjaxResult add(String game) {
-        gameService.add(game);
+        IGameService.add(game);
         return AjaxResult.success();
     }
 
@@ -58,7 +58,7 @@ public class GameController {
     @PostMapping("/update")
     public AjaxResult update(@RequestBody Game game) {
         // 发送消息
-        gameService.update(game);
+        IGameService.update(game);
         return AjaxResult.success();
     }
 

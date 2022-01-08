@@ -1,20 +1,15 @@
 package io.uouo.wechatbot.service.impl;
 
 import io.uouo.wechatbot.entity.Game;
-import io.uouo.wechatbot.entity.Shake;
 import io.uouo.wechatbot.mapper.GameMapper;
-import io.uouo.wechatbot.mapper.ShakeMapper;
-import io.uouo.wechatbot.service.GameService;
-import io.uouo.wechatbot.service.ShakeService;
+import io.uouo.wechatbot.service.IGameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
-public class GameServiceImpl implements GameService {
+public class IIGameServiceImpl implements IGameService {
     @Autowired
     private GameMapper gameMapper;
 

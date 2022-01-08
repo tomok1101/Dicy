@@ -1,18 +1,17 @@
 package io.uouo.wechatbot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.uouo.wechatbot.entity.Game;
+import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.entity.Gift;
-import io.uouo.wechatbot.mapper.GameMapper;
 import io.uouo.wechatbot.mapper.GiftMapper;
-import io.uouo.wechatbot.service.GiftService;
+import io.uouo.wechatbot.service.IGiftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class GiftServiceImpl implements GiftService {
+public class IGiftServiceImpl implements IGiftService {
     @Autowired
     private GiftMapper giftMapper;
 
@@ -77,7 +76,7 @@ public class GiftServiceImpl implements GiftService {
     @Override
     public String get(String wxid) {
         List<Gift> giftList = giftMapper.selectList(null);
-        int i = listRoll(giftList.size()) - 1;
+        int i = RollUtil.iRoll(giftList.size()) - 1;
         String gift = giftList.get(i).getGift();
         giftMapper.deleteById(giftList.get(i).getId());
         return gift;
@@ -94,12 +93,6 @@ public class GiftServiceImpl implements GiftService {
     @Override
     public void del(String name) {
         giftMapper.delete(new QueryWrapper<Gift>().eq("gift",name));
-    }
-
-
-    private int listRoll(int i) {
-        int dice = (int) (Math.random() * i +1);
-        return dice;
     }
 
 }
