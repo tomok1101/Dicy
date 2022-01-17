@@ -71,7 +71,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 //            // 不等于心跳包
 //            WechatReceiveMsg wechatReceiveMsg = JSONObject.parseObject(msg, WechatReceiveMsg.class);
 //            if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType())) {
-//                HttpUtil.post(WechatBotConfig.wechatMsgServerUrl, msg);
+//                HttpUtil.post(WechatBotConfig.wechatMsgServerUrl, msg  );
 //            }
 //        }
 
@@ -79,10 +79,11 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
         WechatReceiveMsg wechatReceiveMsg = JSONObject.parseObject(msg, WechatReceiveMsg.class);
         if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) //屏蔽心跳
                 && wechatReceiveMsg.getWxid() != null //屏蔽空id
-                && wechatReceiveMsg.getContent().contains(".")) //屏蔽非指令
+                && wechatReceiveMsg.getContent().contains(".") //屏蔽非指令
+        )
         {
 //            System.out.println("微信中收到了消息:" + msg);
-            sheSay.sheJudged(wechatReceiveMsg);
+//            sheSay.sheJudged(wechatReceiveMsg);
         }
     }
 

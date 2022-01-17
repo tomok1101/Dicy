@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class SheSayServiceImpl implements SheSayService {
@@ -33,16 +35,88 @@ public class SheSayServiceImpl implements SheSayService {
     @Override
     public void sheJudged(WechatReceiveMsg wechatReceiveMsg) {
 
-//      闭群测试
-
+        //图灵测试
         if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")) {
-            
+            return;
         }
 
         String rContent = wechatReceiveMsg.getContent();//收到消息串
         WechatMsg replyMsg = new WechatMsg();//回复消息实体
         replyMsg.setWxid(wechatReceiveMsg.getWxid());//回复到群
         String result = "";//回复信息串
+
+
+        // .d 掷骰
+        if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.\\s*(\\d+)\\s*d(\\d+)").matcher(rContent);
+            Integer times = Integer.valueOf(matcher.group(1));
+            Integer points = Integer.valueOf(matcher.group(2));
+            if ((times.intValue() > 99) || (points.intValue() > 9999) || times <= 0 || points <= 0) {
+                result = "不许乱骰！";
+            } else {
+                result = "点数 -> ";
+                for (int i = 0; i < times.intValue(); i++) {
+                    if (i != times.intValue() - 1) {
+                        result = result + (int) (Math.random() * points.intValue() + 1.0D) + ", ";
+                    } else {
+                        result = result + (int) (Math.random() * points.intValue() + 1.0D);
+                    }
+                }
+            }
+        }
+
+        // .ra 事件判定
+        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
+            String event = matcher.group(1);
+            Integer point = Integer.valueOf(matcher.group(2));
+            String diceResult = "";
+            int rate = RollUtil.hundredRoll();
+
+            if (100 > point) {
+                if (rate >= point) {
+                    diceResult = rate >= 95 ? "大失败" : "失败";
+                } else if (rate == point) {
+                    diceResult = "勉强成功";
+                } else if (rate < point) {
+                    if (rate < point / 5) {
+                        diceResult = rate <= 5 ? "大！成！功！" : "极难成功";
+                    } else if (rate < point / 2) {
+                        diceResult = "困难成功";
+                    } else {
+                        diceResult = "成功";
+                    }
+                }
+                result = "进行" + event + "判定:\n";
+                result = result + "D100 = " + rate + "/" + point + " " + diceResult;
+            }
+            else {
+                return;
+            }
+        }
+
+        // .吃
+        else if (Pattern.compile("^.吃什么|^.吃撒子|^.恰啥").matcher(rContent).find()) {
+            if (RollUtil.iRoll(10) > 5) {
+                result = foodList.get(RollUtil.iRoll(foodList.size() - 1));
+            } else {
+                result = "骰娘推荐恰：" + iFoodService.selectByid(RollUtil.iRoll(iFoodService.countAll())).getFood();
+            }
+        }
+
+        //
+        else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
+            String s = matcher.group(1);
+
+
+        } else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
+            String s = matcher.group(1);
+
+        } else {
+            System.out.println("NO MATCH");
+        }
 
 
         // @ 先看看是不是男桐
@@ -74,34 +148,6 @@ public class SheSayServiceImpl implements SheSayService {
             }
         }
 
-        // @ .rc丢骰子
-        else if (rContent.contains(".rc")) {
-
-            String[] results = rContent.split(" ");
-            String event = results[1];
-            Integer point = Integer.valueOf(results[2]);
-            String diceResult = "";
-            int dice = RollUtil.hundredRoll();
-
-            if (point < 100) {
-                if (point <= dice) {
-                    diceResult = dice >= 95 ? "大失败" : "失败";
-                } else if (point == dice) {
-                    diceResult = "勉强成功";
-                } else if (point > dice) {
-
-                    if (point / 5 > dice) {
-                        diceResult = dice <= 5 ? "大！成！功！" : "极难成功";
-                    } else if (point / 2 > dice) {
-                        diceResult = "困难成功";
-                    } else {
-                        diceResult = "成功";
-                    }
-                }
-                result = "进行" + event + "判定:\n";
-                result = result + "D100 = " + dice + "/" + point + " " + diceResult;
-            }
-        }
 
         // @ 抽签
         else if (rContent.contains("抽签")) {
@@ -114,10 +160,7 @@ public class SheSayServiceImpl implements SheSayService {
             result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
                     " 宜：" + iActivityService.selectByid(chouQianNum).getActivity() + "、" + iActivityService.selectByid(chouQianNumNum).getActivity() + "\n" +
                     "今日有缘游戏：《" + iGameService.selectByid(RollUtil.iRoll(iGameService.countAll())).getGame() + "》来，试试看吧！";
-        }
-
-        // @ 吃饭
-        else if (rContent.contains("吃什么") || rContent.contains("吃撒子")) {
+        } else if (rContent.contains("吃什么") || rContent.contains("吃撒子")) {
             if (RollUtil.iRoll(10) > 5) {
                 result = foodList.get(RollUtil.iRoll(foodList.size() - 1));
             } else {
@@ -128,17 +171,16 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // @ 圣诞快乐
-        else if (rContent.contains("重抽")) {
-            iGiftService.put();
-            
-        } else if (rContent.contains("del")) {
+        else if (rContent.contains("mc.reset")) {
+            iGiftService.reset();
+        } else if (rContent.contains("mc.del")) {
             String del = rContent.replace("@骰娘del", "");
             iGiftService.del(del);
-            
-        } else if (rContent.contains("add")) {
+
+        } else if (rContent.contains("mc.add")) {
             String add = rContent.replace("@骰娘add", "");
             iGiftService.add(add);
-            
+
         } else if (rContent.contains("圣诞快乐")) {
 
             String gift = iGiftService.get(wechatReceiveMsg.getId1());
@@ -146,47 +188,21 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
 
-        // @ 普通的丢骰子
-        else if (rContent.contains("d")) {
-            rContent.replace(".","");
-            String[] ds = rContent.split("d");
-            if (ds.length == 2) {
-                Integer i1 = Integer.valueOf(ds[0]);
-                Integer i2 = Integer.valueOf(ds[1]);
-                if ((i1.intValue() > 99) || (i2.intValue() > 9999) || i1 <= 0 || i2 <= 0) {
-                    result = "不许乱骰！";
-                } else {
-                    result = "点数->";
-                    for (int i = 0; i < i1.intValue(); i++) {
-                        if (i != i1.intValue() - 1){
-                            result = result + (int) (Math.random() * i2.intValue() + 1.0D) + ", ";
-                        }
-                        else {
-                            result = result + (int) (Math.random() * i2.intValue() + 1.0D);
-                        }
-                    }
-                }
-            }
 
+
+        //错误指令返回
+        else {
+            return;
         }
-
-
-//        //群主的任务罢了 废除
-//        else if (wechatReceiveMsg.getWxid() != null) {
-//            if (wechatReceiveMsg.getWxid().equals("wxid_e8rr05qphvq221")) {
-//                String mission = wechatReceiveMsg.getContent();
-//
-//            }
-//        }
-
 
         replyMsg.setContent(result);
         wechatBotService.sendTextMsg(replyMsg);
+
     }
 
     //
 //DLC 男桐名单.tom
-    private static List<String> nantongList = Arrays.asList("柯基", "富贵", "游零", "东宝", "汉堡王", "丝袜", "tom", "PMD", "AMD", "黑总");
+    private static List<String> nantongList = Arrays.asList("柯基", "富贵", "游零", "汉堡王", "丝袜", "tom", "PMD", "AMD", "黑总");
 
     //DLC 吃什么.plus
     private static List<String> foodList = Arrays.asList(

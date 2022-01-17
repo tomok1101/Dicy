@@ -2,7 +2,7 @@ package io.uouo.wechatbot.service;
 
 public interface IGiftService {
     //查询总数
-    void put();
+    void reset();
 
     String get(String wxid);
 

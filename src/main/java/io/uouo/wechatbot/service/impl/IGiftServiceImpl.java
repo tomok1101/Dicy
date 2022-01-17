@@ -17,7 +17,7 @@ public class IGiftServiceImpl implements IGiftService {
 
 
     @Override
-    public void put() {
+    public void reset() {
         giftMapper.delete(null);
         Gift gift1 = new Gift();
         gift1.setWxid("wxid_ary60w783fjn21");
