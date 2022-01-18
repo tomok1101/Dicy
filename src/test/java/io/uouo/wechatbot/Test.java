@@ -1,14 +1,11 @@
 package io.uouo.wechatbot;
 
 import io.uouo.wechatbot.mapper.GameMapper;
-import io.uouo.wechatbot.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class Test {
-    @Autowired
-    UserMapper userMapper;
     @Autowired
     GameMapper gameMapper;
 

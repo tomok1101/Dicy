@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("gift")
-public class Gift {
+@TableName("merry_christmas")
+public class MerryChristmas {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     private String gift;

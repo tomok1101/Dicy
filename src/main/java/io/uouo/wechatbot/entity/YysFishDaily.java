@@ -7,12 +7,32 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("activity")
-public class Activity {
+@TableName("yys_fish_daily")
+public class YysFishDaily {
+    /**
+     * id
+     */
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
-    private String activity;
+
+    /**
+     * 日期
+     */
+    private Date date;
+
+    /**
+     * 微信id
+     */
+    private String wxid;
+
+    /**
+     * 鱼级
+     */
+    private Integer fishLv;
+
 }

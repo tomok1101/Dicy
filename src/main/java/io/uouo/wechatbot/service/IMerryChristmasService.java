@@ -1,6 +1,6 @@
 package io.uouo.wechatbot.service;
 
-public interface IGiftService {
+public interface IMerryChristmasService {
     //查询总数
     void reset();
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("food")
+@TableName("what_to_eat")
 public class Food {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;

@@ -4,6 +4,9 @@ import io.uouo.wechatbot.domain.WechatReceiveMsg;
 
 public interface SheSayService {
     //回复
-    void sheJudged(WechatReceiveMsg wechatReceiveMsg);
+    void sheReplying(WechatReceiveMsg wechatReceiveMsg);
+
+    //统计
+    void sheCounting(WechatReceiveMsg wechatReceiveMsg);
 
 }
