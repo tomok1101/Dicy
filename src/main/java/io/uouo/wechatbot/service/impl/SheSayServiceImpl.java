@@ -158,7 +158,7 @@ public class SheSayServiceImpl implements SheSayService {
 
         // .你的名字
         else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.set\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+$)").matcher(rContent);
+            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+$)").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(1);
             YysDearfriend dearfriend = new YysDearfriend();
