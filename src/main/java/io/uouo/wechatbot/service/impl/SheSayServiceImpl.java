@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,9 +44,9 @@ public class SheSayServiceImpl implements SheSayService {
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
 
         //图灵测试
-        if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")) {
-            return;
-        }
+//        if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")) {
+//            return;
+//        }
 
         String rContent = wechatReceiveMsg.getContent();//收到消息串
         WechatMsg replyMsg = new WechatMsg();//回复消息实体
@@ -177,11 +178,22 @@ public class SheSayServiceImpl implements SheSayService {
 
             Integer lv = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
             if (lv <= 10){
-                result = "检测到摸鱼级别为Lv " + lv + "，建议多摸哦";
+                result = "检测到摸鱼级别为Lv_" + lv + "，建议多摸哦";
             }
             else if (lv > 10){
-                result = "检测到摸鱼级别为Lv " + lv + "，什么嘛，这不是很会摸吗";
+                result = "检测到摸鱼级别为Lv_" + lv + "，什么嘛，这不是很会摸吗";
             }
+        }
+
+        //  .日摸量
+        else if (Pattern.compile("^.日摸量").matcher(rContent).find()) {
+            Map<String, Object> param = iYysFishDailyService.touchToday();
+            Integer tt = (Integer) param.get("TT");
+            String tk = (String) param.get("TK");
+            Integer tm = (Integer) param.get("TM");
+
+            result = "今天的摸鱼量：" + tt + " | 摸鱼人数：" + tm + " | 摸鱼king是......" + tk + "！！！";
+
         }
 
 //        else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
@@ -203,7 +215,7 @@ public class SheSayServiceImpl implements SheSayService {
     @Override
     public void sheCounting(WechatReceiveMsg msg) {
         //yys-cd 摸鱼lv up
-        if (msg.getWxid().equals("24355601674@chatroom")) {
+        if (msg.getWxid().equals("18929140647@chatroom")) {
             iYysFishDailyService.touch(msg.getId1());
         }
         return;
