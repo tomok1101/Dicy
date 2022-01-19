@@ -7,17 +7,30 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("shakeman")
-public class Shakeman {
+@TableName("suggestion")
+public class Suggestion {
+    /**
+     * id
+     */
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
-    private Integer carId;
+
+    /**
+     * 微信id
+     */
     private String wxid;
-    private Integer nickname;
-    private Date creatTime;
+
+    /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
+     * 意见
+     */
+    private String suggestion;
+
 }

@@ -10,6 +10,7 @@ import io.uouo.wechatbot.service.IYysFishDailyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     public void touch(String wxid) {
         YysFishDaily yysFishDaily = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getWxid, wxid)
-                .eq(YysFishDaily::getDate, new Date())
+                .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
         );
         if (yysFishDaily == null){
             yysFishDaily = new YysFishDaily();
@@ -45,34 +46,27 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     public Integer touchLv(String wxid) {
         YysFishDaily fish = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getWxid, wxid)
-                .eq(YysFishDaily::getDate, new Date()));
+                .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
         return fish == null ? 0 : fish.getFishLv();
     }
 
     @Override
     public Map<String, Object> touchToday() {
         List<YysFishDaily> list = fishDailyMapper.selectList(new QueryWrapper<YysFishDaily>().lambda()
-                .eq(YysFishDaily::getDate, new Date()));
+                .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
+                .orderByDesc(YysFishDaily::getFishLv)
+        );
         Integer touchToday = 0;
         String touchKing = "";
-        Integer kingLv = null;
         if (ObjectUtil.isNotEmpty(list)){
             for (YysFishDaily fish :
                     list) {
                 touchToday += fish.getFishLv() == null ? 0 : fish.getFishLv();
-                if (kingLv == null) {
-                    kingLv = fish.getFishLv();
-                    touchKing = fish.getWxid();
-                } else {
-                    if (kingLv.compareTo(fish.getFishLv()) > 0) {
-                        kingLv = fish.getFishLv();
-                        touchKing = fish.getWxid();
-                    }
-                }
+                touchKing = list.get(0).getWxid();
             }
         }
         if (!"".equals(touchKing)){
-            YysDearfriend dearfriend = dearfriendMapper.selectById(touchKing);
+            YysDearfriend dearfriend = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid,touchKing));
             if (ObjectUtil.isNotEmpty(dearfriend)){
                 touchKing = dearfriend.getNickname();
             }

@@ -3,6 +3,7 @@ package io.uouo.wechatbot.service.impl;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
+import io.uouo.wechatbot.entity.Suggestion;
 import io.uouo.wechatbot.entity.YysDearfriend;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,29 +41,43 @@ public class SheSayServiceImpl implements SheSayService {
     @Autowired
     private IYysFishDailyService iYysFishDailyService;
 
+    @Autowired
+    private ISuggestionService iSuggestionService;
+
     @Override
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
-
-        //图灵测试
-//        if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")) {
-//            return;
-//        }
 
         String rContent = wechatReceiveMsg.getContent();//收到消息串
         WechatMsg replyMsg = new WechatMsg();//回复消息实体
         replyMsg.setWxid(wechatReceiveMsg.getWxid());//回复到群
         String result = "";//回复信息串
 
+        // .help
+        if (Pattern.compile("^.help$").matcher(rContent).find()) {
+            result = "骰娘正义使用指南，让我看看谁敢指北(⓿_⓿)！\n";
+            result += "|1 .ndn+事件\n";
+            result += "|2 .ra+事件+点数\n";
+            result += "|3 .r+事件\n";
+            result += "|4 .吃什么\n";
+            result += "|5 .抽签\n";
+            result += "|6 .login+用户名\n";
+            result += "|7 .摸\n";
+            result += "|8 .日摸量\n";
+            result += "|9 .send+意见\n";
+        }
+
+
         // .d 掷骰
-        if (Pattern.compile("^.(\\d+)d(\\d+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)").matcher(rContent);
+        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             Integer times = Integer.valueOf(matcher.group(1));
             Integer points = Integer.valueOf(matcher.group(2));
+            String event = matcher.group(3);
             if ((times.intValue() > 99) || (points.intValue() > 9999) || times <= 0 || points <= 0) {
                 result = "不许乱骰！";
             } else {
-                result = "点数 -> ";
+                result = event + "投掷点数 -> ";
                 for (int i = 0; i < times.intValue(); i++) {
                     if (i != times.intValue() - 1) {
                         result = result + (int) (Math.random() * points.intValue() + 1.0D) + ", ";
@@ -102,6 +117,15 @@ public class SheSayServiceImpl implements SheSayService {
             else {
                 return;
             }
+        }
+
+        // .r
+        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]*$)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]*$)").matcher(rContent);
+            matcher.find();
+            String events = matcher.group(1);
+            String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
+            result = name + "进行" + events + "投掷，点数为：" + RollUtil.hundredRoll();
         }
 
         // .吃
@@ -157,8 +181,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .你的名字
-        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+$)").matcher(rContent);
+        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5，。?]+$)").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(1);
             YysDearfriend dearfriend = new YysDearfriend();
@@ -177,11 +201,12 @@ public class SheSayServiceImpl implements SheSayService {
         else if (Pattern.compile("^.摸$").matcher(rContent).find()) {
 
             Integer lv = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
+            String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
             if (lv <= 10){
-                result = "检测到摸鱼级别为Lv_" + lv + "，建议多摸哦";
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，建议多摸哦";
             }
             else if (lv > 10){
-                result = "检测到摸鱼级别为Lv_" + lv + "，什么嘛，这不是很会摸吗";
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，什么嘛，这不是很会摸吗";
             }
         }
 
@@ -194,6 +219,25 @@ public class SheSayServiceImpl implements SheSayService {
 
             result = "今天的摸鱼量：" + tt + " | 摸鱼人数：" + tm + " | 摸鱼king是......" + tk + "！！！";
 
+        }
+
+        // .看看
+//        else if (Pattern.compile("^看看$").matcher(rContent).find()) {
+//            result = "看看";
+//        }
+
+        //  .send
+        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9_\\u4e00-\\u9fa5]+)$").matcher(rContent);
+            matcher.find();
+            String s = matcher.group(1);
+            String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
+            Suggestion suggestion = new Suggestion();
+            suggestion.setWxid(wechatReceiveMsg.getId1());
+            suggestion.setNickname(name);
+            suggestion.setSuggestion(s);
+            iSuggestionService.send(suggestion);
+            result = "您的意见收到！骰娘使命必达！下次一定改！";
         }
 
 //        else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
@@ -218,6 +262,11 @@ public class SheSayServiceImpl implements SheSayService {
         if (msg.getWxid().equals("18929140647@chatroom")) {
             iYysFishDailyService.touch(msg.getId1());
         }
+
+        //图灵测试
+//        if (msg.getWxid().equals("24355601674@chatroom")) {
+//            iYysFishDailyService.touch(msg.getId1());
+//        }
         return;
     }
 
