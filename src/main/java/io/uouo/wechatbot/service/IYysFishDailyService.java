@@ -1,5 +1,7 @@
 package io.uouo.wechatbot.service;
 
+import io.uouo.wechatbot.entity.YysFishDaily;
+
 import java.util.Map;
 
 public interface IYysFishDailyService {
@@ -8,9 +10,12 @@ public interface IYysFishDailyService {
     void touch(String wxid);
 
     //摸了多少
-    Integer touchLv(String wxid);
+    YysFishDaily touchLv(String wxid);
 
     //日摸量
     Map<String, Object> touchToday();
+
+    //除你fish
+    Integer expellifish(String wxid, String nickname, Integer damage);
 
 }

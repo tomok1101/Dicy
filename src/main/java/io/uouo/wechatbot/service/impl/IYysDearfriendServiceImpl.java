@@ -22,7 +22,9 @@ public class IYysDearfriendServiceImpl implements IYysDearfriendService {
 
     @Override
     public boolean add(YysDearfriend dearfriend) {
-        YysDearfriend oldDear = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid,dearfriend.getWxid()));
+        YysDearfriend oldDear = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda()
+                .eq(YysDearfriend::getWxid,dearfriend.getWxid()).or().eq(YysDearfriend::getNickname,dearfriend.getNickname())
+        );
         if (ObjectUtil.isNotEmpty(oldDear)){
             return false;
         }

@@ -31,8 +31,23 @@ public class YysFishDaily {
     private String wxid;
 
     /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
      * 鱼级
      */
     private Integer fishLv;
+
+    /**
+     * 附加级
+     */
+    private Integer bonusLv;
+
+    /**
+     * 除你fish
+     */
+    private Integer expellifish;
 
 }
