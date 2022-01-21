@@ -99,26 +99,31 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     }
 
     @Override
-    public Integer expellifish(String wxid, String nickname, Integer damage) {
+    public Map<String, Object> expellifish(String wxid, String nickname, Integer damage) {
+        Map<String, Object> param = new HashMap<>();
         YysFishDaily poorMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getNickname, nickname)
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
         if (ObjectUtil.isEmpty(poorMan)){
-            return null;
+            param.put("status","miss");
+            return param;
         }
         YysFishDaily badMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getWxid, wxid)
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
         );
         if (badMan.getExpellifish() <= 0){
-            return null;
+            param.put("status","null");
+            return param;
         }
         badMan.setExpellifish(badMan.getExpellifish()-1);
         int i = RollUtil.iRoll(damage);
         poorMan.setBonusLv(poorMan.getBonusLv() + i);
         fishDailyMapper.updateById(poorMan);
         fishDailyMapper.updateById(badMan);
-        return i;
+        param.put("status","headShot");
+        param.put("damage",i);
+        return param;
     }
 
 }

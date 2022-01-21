@@ -16,6 +16,6 @@ public interface IYysFishDailyService {
     Map<String, Object> touchToday();
 
     //除你fish
-    Integer expellifish(String wxid, String nickname, Integer damage);
+    Map<String, Object> expellifish(String wxid, String nickname, Integer damage);
 
 }

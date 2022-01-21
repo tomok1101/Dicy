@@ -1,6 +1,5 @@
 package io.uouo.wechatbot.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
@@ -76,9 +75,9 @@ public class SheSayServiceImpl implements SheSayService {
             result += "| 8 .除你fish/.expellifish + 目标 | 除你fish！\n";
             result += "| 8 .日摸量 | 不会大家都在工作吧？不会吧\n";
             result += "| 9 .draw | 抽一张塔罗牌\n";
-            result += "| 0 .send+意见 | 笨比开发tom能力有限，\n希望提出正经宝贵意见和想要的功能，哦捏改！\n";
+            result += "| 0 .send+意见 | 笨比开发tom能力有限，\n希望提出正经宝贵意见和想要的功能！\n";
             result += "| 谢谢你跟骰娘聊天，希望你摸鱼一下休息开心( •̀ ω •́ )✧\n";
-            result += "| ps：感谢东宝补充了多达15个摸鱼事件！每个都笑到骰娘打嗝！\n";
+            result += "| ps：感谢东宝贡献的7个摸鱼事件！您有好玩的事件可以.send发送\n";
 
         }
 
@@ -269,16 +268,18 @@ public class SheSayServiceImpl implements SheSayService {
 
         // .除你fish/.expellifish
         else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.除你fish\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent);
+            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent);
             matcher.find();
-            String nickname = matcher.group(1);
+            String nickname = matcher.group(2);
             ExpellifishEvent event = iExpellifishEventService.getEvent();
-            int damage = iYysFishDailyService.expellifish(wechatReceiveMsg.getId1(), nickname, event.getMax());
-            if (ObjectUtil.isNotEmpty(damage)){
-                //成功
-                result = String.format(event.getFishEvent(), nickname, damage);
-            }else {
+            Map<String, Object> expellifish = iYysFishDailyService.expellifish(wechatReceiveMsg.getId1(), nickname, event.getMax());
+            if ("miss".equals(expellifish.get("status"))){
+                //瞄错了
+                result = "请瞄准再打...";
+            }else if("null".equals(expellifish.get("status"))){
                 result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
+            }else {
+                String.format(event.getFishEvent(), nickname, (Integer) expellifish.get("damage"));
             }
 
         }
@@ -328,7 +329,12 @@ public class SheSayServiceImpl implements SheSayService {
 //
 //        }
 
-        else {
+        //汤の任务
+        else if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
+            result = wechatReceiveMsg.getContent();
+            replyMsg.setWxid("18929140647@chatroom");
+            return;
+        } else {
             return;
         }
 
@@ -339,15 +345,7 @@ public class SheSayServiceImpl implements SheSayService {
 
     @Override
     public void sheCounting(WechatReceiveMsg msg) {
-        //yys-cd 摸鱼lv up
-        if (msg.getWxid().equals("18929140647@chatroom")) {
-            iYysFishDailyService.touch(msg.getId1());
-        }
-
-        //图灵测试
-//        if (msg.getWxid().equals("24355601674@chatroom")) {
-//            iYysFishDailyService.touch(msg.getId1());
-//        }
+        iYysFishDailyService.touch(msg.getId1());
         return;
     }
 
