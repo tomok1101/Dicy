@@ -83,8 +83,8 @@ public class SheSayServiceImpl implements SheSayService {
 
 
         // .d 掷骰
-        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]+)").matcher(rContent);
+        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             Integer times = Integer.valueOf(matcher.group(1));
             Integer points = Integer.valueOf(matcher.group(2));
@@ -104,8 +104,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .ra 事件判定
-        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
+        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
             matcher.find();
             String event = matcher.group(1);
             Integer point = Integer.valueOf(matcher.group(2));
@@ -135,8 +135,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .r
-        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]*$)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]*$)").matcher(rContent);
+        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*$)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*$)").matcher(rContent);
             matcher.find();
             String events = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -196,8 +196,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .login  你的名字
-        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+$)").matcher(rContent);
+        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+$)").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(1);
             YysDearfriend dearfriend = new YysDearfriend();
@@ -267,8 +267,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .除你fish/.expellifish
-        else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent);
+        else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(2);
             ExpellifishEvent event = iExpellifishEventService.getEvent();
@@ -279,7 +279,7 @@ public class SheSayServiceImpl implements SheSayService {
             }else if("null".equals(expellifish.get("status"))){
                 result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
             }else {
-                String.format(event.getFishEvent(), nickname, (Integer) expellifish.get("damage"));
+                result = String.format(event.getFishEvent(), nickname, (Integer) expellifish.get("damage"));
             }
 
         }
@@ -301,8 +301,8 @@ public class SheSayServiceImpl implements SheSayService {
 //        }
 
         //  .send
-        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9_。？！\\u4e00-\\u9fa5]+)$").matcher(rContent);
+        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9_，。？！\\s\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)$").matcher(rContent);
             matcher.find();
             String s = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -333,7 +333,6 @@ public class SheSayServiceImpl implements SheSayService {
         else if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
             result = wechatReceiveMsg.getContent();
             replyMsg.setWxid("18929140647@chatroom");
-            return;
         } else {
             return;
         }

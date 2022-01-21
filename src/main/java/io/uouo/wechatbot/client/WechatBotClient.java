@@ -78,11 +78,11 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
         WechatReceiveMsg wechatReceiveMsg = JSONObject.parseObject(msg, WechatReceiveMsg.class);
         if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
             //图灵测试
-//            if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom")) {
+//            if (!wechatReceiveMsg.getWxid().equals("24355601674@chatroom") && !wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
 //                return;
 //            }
             //游研社
-            if (!wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) {
+            if (!wechatReceiveMsg.getWxid().equals("18929140647@chatroom") && !wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
                 return;
             }
 //            System.out.println("微信中收到了消息:" + msg);
