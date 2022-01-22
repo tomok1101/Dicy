@@ -87,7 +87,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
             }
 //            System.out.println("微信中收到了消息:" + msg);
 
-            sheSay.sheCounting(wechatReceiveMsg);
+
             sheSay.sheReplying(wechatReceiveMsg);
 
         }

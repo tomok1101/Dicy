@@ -10,12 +10,14 @@ import io.uouo.wechatbot.mapper.YysFishDailyMapper;
 import io.uouo.wechatbot.service.IYysFishDailyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     @Autowired
     private YysFishDailyMapper fishDailyMapper;
@@ -60,17 +62,6 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     @Override
     public Map<String, Object> touchToday() {
 
-        List<YysDearfriend> yysDearfriends = dearfriendMapper.selectList(null);
-        List<YysFishDaily> fishList = fishDailyMapper.selectList(null);
-        Map<String, List<YysDearfriend>> collect = yysDearfriends.stream().collect(Collectors.groupingBy(YysDearfriend::getWxid));
-        fishList.forEach(e -> {
-
-            e.setNickname(collect.get(e.getWxid()) == null ? "那个谁":collect.get(e.getWxid()).get(0).getNickname());
-            e.setBonusLv(0);
-            e.setExpellifish(0);
-        });
-        fishList.forEach(e -> fishDailyMapper.updateById(e));
-
         List<YysFishDaily> list = fishDailyMapper.selectList(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
                 .orderByDesc(YysFishDaily::getFishLv)
@@ -104,7 +95,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         YysFishDaily poorMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getNickname, nickname)
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
-        if (ObjectUtil.isEmpty(poorMan)){
+        if (ObjectUtil.isNull(poorMan)){
             param.put("status","miss");
             return param;
         }
@@ -112,7 +103,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                 .eq(YysFishDaily::getWxid, wxid)
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
         );
-        if (badMan.getExpellifish() <= 0){
+        if (badMan.getExpellifish() == 0){
             param.put("status","null");
             return param;
         }

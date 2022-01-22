@@ -56,6 +56,7 @@ public class SheSayServiceImpl implements SheSayService {
 
     @Override
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
+        this.sheCounting(wechatReceiveMsg);
 
         String rContent = wechatReceiveMsg.getContent();//收到消息串
         WechatMsg replyMsg = new WechatMsg();//回复消息实体
@@ -77,14 +78,14 @@ public class SheSayServiceImpl implements SheSayService {
             result += "| 9 .draw | 抽一张塔罗牌\n";
             result += "| 0 .send+意见 | 笨比开发tom能力有限，\n希望提出正经宝贵意见和想要的功能！\n";
             result += "| 谢谢你跟骰娘聊天，希望你摸鱼一下休息开心( •̀ ω •́ )✧\n";
-            result += "| ps：感谢东宝贡献的7个摸鱼事件！您有好玩的事件可以.send发送\n";
+            result += "| ps：诚招除你fish事件\n";
 
         }
 
 
         // .d 掷骰
-        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)").matcher(rContent);
+        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             Integer times = Integer.valueOf(matcher.group(1));
             Integer points = Integer.valueOf(matcher.group(2));
@@ -104,8 +105,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .ra 事件判定
-        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
+        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
             matcher.find();
             String event = matcher.group(1);
             Integer point = Integer.valueOf(matcher.group(2));
@@ -135,8 +136,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .r
-        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*$)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]*$)").matcher(rContent);
+        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
             matcher.find();
             String events = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -196,8 +197,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .login  你的名字
-        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+$)").matcher(rContent);
+        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(1);
             YysDearfriend dearfriend = new YysDearfriend();
@@ -217,61 +218,62 @@ public class SheSayServiceImpl implements SheSayService {
 
             YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
             Integer lv = fish.getFishLv() + fish.getBonusLv();
+            lv = Math.abs(lv);
             Integer expellifish = fish.getExpellifish();
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
             if (lv < 0){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，社会主义的终极敌人......您都不算是资本の狂热信徒，那......也可能是被创了，为什么被创反思自己的所作所为哦，摸出成就“资本与创伤”\nexpellifish->" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，社会主义的终极敌人......您要么是资本の狂热信徒，要么是被创了，为什么被创反思自己的所作所为哦，摸出成就“资本与创伤”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv <= 5){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，就这，你管这叫摸鱼？老板赚疯了！\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，就这，你管这叫摸鱼？老板赚疯了！\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 15){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 30){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您战战兢兢，摸出成就“逐渐步入正轨啦”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您战战兢兢，摸出成就“逐渐步入正轨啦”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 50){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您小有心得，摸出成就“摸鱼新手-十里坡剑圣”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您小有心得，摸出成就“摸鱼新手-十里坡剑圣”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 75){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 105){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 140){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 180){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您就是高，摸出成就“摸鱼高级-摸鱼达人”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您就是高，摸出成就“摸鱼高级-摸鱼达人”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 225){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 270){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 325){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 380){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 445){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 515){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”\nexpellifish -> 【" + expellifish + "】";
             }
             else if (lv < 590){
-                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”\nexpellifish" + expellifish;
+                result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”\nexpellifish -> 【" + expellifish + "】";
             }
         }
 
         // .除你fish/.expellifish
-        else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5，。?]+)$").matcher(rContent);
+        else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(2);
             ExpellifishEvent event = iExpellifishEventService.getEvent();
@@ -304,8 +306,8 @@ public class SheSayServiceImpl implements SheSayService {
 //        }
 
         //  .send
-        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9_，。？！\\s\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9_，。？！\\u4e00-\\u9fa5]+)$").matcher(rContent);
+        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9,.，。？！、\\s\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             String s = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
