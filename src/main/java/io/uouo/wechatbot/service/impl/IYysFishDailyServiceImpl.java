@@ -34,12 +34,21 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         YysDearfriend dearfriend = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid, wxid));
         if (yysFishDaily == null){
             yysFishDaily = new YysFishDaily();
-            yysFishDaily.setDate(new Date());
             yysFishDaily.setWxid(wxid);
             yysFishDaily.setNickname(dearfriend == null ? "那个谁" : dearfriend.getNickname());
             yysFishDaily.setFishLv(1);
             yysFishDaily.setBonusLv(0);
-            yysFishDaily.setExpellifish(0);
+
+            Calendar cal = Calendar.getInstance();
+            Date date = new Date();
+            cal.setTime(date);
+            int w = cal.get(Calendar.DAY_OF_WEEK);
+            if (w == 1 || w == 7){
+                yysFishDaily.setExpellifish(5);
+            }else {
+                yysFishDaily.setExpellifish(1);
+            }
+            yysFishDaily.setDate(date);
             fishDailyMapper.insert(yysFishDaily);
         }else {
             int i = yysFishDaily.getFishLv() + 1;
