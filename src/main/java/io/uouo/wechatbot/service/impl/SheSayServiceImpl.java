@@ -3,10 +3,7 @@ package io.uouo.wechatbot.service.impl;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
-import io.uouo.wechatbot.entity.ExpellifishEvent;
-import io.uouo.wechatbot.entity.Suggestion;
-import io.uouo.wechatbot.entity.YysDearfriend;
-import io.uouo.wechatbot.entity.YysFishDaily;
+import io.uouo.wechatbot.entity.*;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,7 +65,7 @@ public class SheSayServiceImpl implements SheSayService {
             result = "| 骰娘正义使用只能指南，不许指北(⓿_⓿)\n";
             result += "| 1 .99d999+事件 | 进行随机数量的随机骰点投掷\n";
             result += "| 2 .rc+事件+点数 | coc规则进行事件成功判定\n";
-            result += "| 3 .r+事件 | 对事件进行1-100的点数投掷\n";
+            result += "| 3 .rd+事件 | 对事件进行1-100的点数投掷\n";
             result += "| 4 .吃什么 | 嗯 就是吃什么\n";
             result += "| 5 .抽签 | 今日运势抽签\n";
             result += "| 6 .login+用户名 | 不注册名字的话骰娘啷个晓得你那个？只能注册一次哦\n";
@@ -76,14 +73,34 @@ public class SheSayServiceImpl implements SheSayService {
             result += "| 8 .除你fish/.expellifish + 目标 | 除你fish！\n";
             result += "| 8 .日摸量 | 不会大家都在工作吧？不会吧\n";
             result += "| 9 .draw | 抽一张塔罗牌\n";
+            result += "| 10 .draw 圣三角牌阵 | 抽三张塔罗牌放置在圣三角牌阵\n";
             result += "| 0 .send+意见 | 笨比开发tom能力有限，\n希望提出正经宝贵意见和想要的功能！\n";
             result += "| 谢谢你跟骰娘聊天，希望你摸鱼一下休息开心( •̀ ω •́ )✧\n";
             result += "| ps：诚招除你fish事件\n";
 
         }
 
-
         // .d 掷骰
+        else if (Pattern.compile("^.(\\d+)d(\\d+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)$").matcher(rContent);
+            matcher.find();
+            Integer times = Integer.valueOf(matcher.group(1));
+            Integer points = Integer.valueOf(matcher.group(2));
+            if ((times.intValue() > 99) || (points.intValue() > 9999) || times <= 0 || points <= 0) {
+                result = "不许乱骰！";
+            } else {
+                result = "投掷点数 -> ";
+                for (int i = 0; i < times.intValue(); i++) {
+                    if (i != times.intValue() - 1) {
+                        result = result + RollUtil.iRoll(times) + ", ";
+                    } else {
+                        result = result + RollUtil.iRoll(points);
+                    }
+                }
+            }
+        }
+
+        // .d 事件 掷骰
         else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
             Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
@@ -104,8 +121,8 @@ public class SheSayServiceImpl implements SheSayService {
             }
         }
 
-        // .ra 事件判定
-        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+)").matcher(rContent).find()) {
+        // .rc 事件判定
+        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+$)").matcher(rContent).find()) {
             Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
             matcher.find();
             String event = matcher.group(1);
@@ -135,9 +152,9 @@ public class SheSayServiceImpl implements SheSayService {
             }
         }
 
-        // .r
-        else if (Pattern.compile("^.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
+        // .rd
+        else if (Pattern.compile("^.rd\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^.rd\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
             matcher.find();
             String events = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -218,7 +235,6 @@ public class SheSayServiceImpl implements SheSayService {
 
             YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
             Integer lv = fish.getFishLv() + fish.getBonusLv();
-            lv = Math.abs(lv);
             Integer expellifish = fish.getExpellifish();
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
             if (lv < 0){
@@ -266,7 +282,7 @@ public class SheSayServiceImpl implements SheSayService {
             else if (lv < 515){
                 result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”\nexpellifish -> 【" + expellifish + "】";
             }
-            else if (lv < 590){
+            else{
                 result = "检测到" + name + "摸鱼级别为Lv_" + lv + "，究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”\nexpellifish -> 【" + expellifish + "】";
             }
         }
@@ -284,7 +300,7 @@ public class SheSayServiceImpl implements SheSayService {
             }else if("null".equals(expellifish.get("status"))){
                 result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
             }else {
-                result = String.format(event.getFishEvent(), nickname, (Integer) expellifish.get("damage"));
+                result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
             }
 
         }
@@ -321,10 +337,21 @@ public class SheSayServiceImpl implements SheSayService {
 
         //.draw
         else if (Pattern.compile("^.draw$").matcher(rContent).find()) {
-            String tarot = iDicyDictService.draw();
+            DicyDict tarot = iDicyDictService.rollByDict("tarot");
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-            result = name + "抽到了:\n" + tarot;
+            String replace = tarot.getValue().replace(":", ":\n");
+            result = name + "抽到了:\n" + replace;
 
+        }
+
+        //.draw 圣三角牌阵
+        else if (Pattern.compile("^.draw\\s*圣三角牌阵$").matcher(rContent).find()) {
+            List<DicyDict> tarot = iDicyDictService.holyTriangle();
+            String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
+            result = name + "抽到了:\n";
+            result += "过去的经验："  + tarot.get(0).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位") + "\n";
+            result += "问题的现状："  + tarot.get(1).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位") + "\n";
+            result += "将来的预测："  + tarot.get(2).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位");
         }
 
 //        else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {

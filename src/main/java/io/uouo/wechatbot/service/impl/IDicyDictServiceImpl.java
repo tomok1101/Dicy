@@ -8,6 +8,7 @@ import io.uouo.wechatbot.service.IDicyDictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -17,11 +18,32 @@ public class IDicyDictServiceImpl implements IDicyDictService {
 
 
     @Override
-    public String draw() {
-        List<DicyDict> tarots = dicyDictMapper.selectList(new QueryWrapper<DicyDict>().lambda()
+    public DicyDict rollByDict(String type) {
+        List<DicyDict> dict = dicyDictMapper.selectList(new QueryWrapper<DicyDict>().lambda()
+                .eq(DicyDict::getCode, type)
+                .orderByAsc(DicyDict::getSort));
+        int i = RollUtil.iRoll(dict.size()) - 1;
+        return dict.get(i);
+    }
+
+    @Override
+    public List<DicyDict> holyTriangle() {
+        List<DicyDict> dictList = dicyDictMapper.selectList(new QueryWrapper<DicyDict>().lambda()
                 .eq(DicyDict::getCode, "tarot")
                 .orderByAsc(DicyDict::getSort));
-        int i = RollUtil.iRoll(tarots.size()) - 1;
-        return tarots.get(i).getValue();
+        int i1 = RollUtil.iRoll(22) - 1;
+        int i2;
+        int i3;
+        do {
+            i2 = RollUtil.iRoll(22) - 1;
+        }while (i2 == i1);
+        do {
+            i3 = RollUtil.iRoll(22) - 1;
+        }while (i3 == i1 && i3 == i2);
+        List<DicyDict> dicts = new LinkedList<>();
+        dicts.add(dictList.get(i1));
+        dicts.add(dictList.get(i2));
+        dicts.add(dictList.get(i3));
+        return dicts;
     }
 }

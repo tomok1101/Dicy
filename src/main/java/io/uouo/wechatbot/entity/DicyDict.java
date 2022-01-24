@@ -26,12 +26,22 @@ public class DicyDict {
     private String code;
 
     /**
-     * 事件值
+     * 内容
      */
     private String value;
+
+    /**
+     * 主题
+     */
+    private String title;
 
     /**
      * 排序
      */
     private Integer sort;
+
+    /**
+     * pid
+     */
+    private Integer pid;
 }
