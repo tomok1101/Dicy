@@ -61,11 +61,11 @@ public class SheSayServiceImpl implements SheSayService {
         String result = "";//回复信息串
 
         // .help
-        if (Pattern.compile("^.help$").matcher(rContent).find()) {
+        if (Pattern.compile("^\\.help$").matcher(rContent).find()) {
             result = "| 骰娘正义使用只能指南，不许指北(⓿_⓿)\n";
             result += "| 1 .99d999+事件 | 进行随机数量的随机骰点投掷\n";
             result += "| 2 .rc+事件+点数 | coc规则进行事件成功判定\n";
-            result += "| 3 .rd+事件 | 对事件进行1-100的点数投掷\n";
+            result += "| 3 .r+事件 | 对事件进行1-100的点数投掷\n";
             result += "| 4 .吃什么 | 嗯 就是吃什么\n";
             result += "| 5 .抽签 | 今日运势抽签\n";
             result += "| 6 .login+用户名 | 不注册名字的话骰娘啷个晓得你那个？只能注册一次哦\n";
@@ -81,8 +81,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .d 掷骰
-        else if (Pattern.compile("^.(\\d+)d(\\d+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)$").matcher(rContent);
+        else if (Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(rContent);
             matcher.find();
             Integer times = Integer.valueOf(matcher.group(1));
             Integer points = Integer.valueOf(matcher.group(2));
@@ -101,8 +101,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .d 事件 掷骰
-        else if (Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
+        else if (Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             Integer times = Integer.valueOf(matcher.group(1));
             Integer points = Integer.valueOf(matcher.group(2));
@@ -122,8 +122,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .rc 事件判定
-        else if (Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+$)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
+        else if (Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+$)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
             matcher.find();
             String event = matcher.group(1);
             Integer point = Integer.valueOf(matcher.group(2));
@@ -152,9 +152,9 @@ public class SheSayServiceImpl implements SheSayService {
             }
         }
 
-        // .rd
-        else if (Pattern.compile("^.rd\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.rd\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
+        // .r
+        else if (Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
             matcher.find();
             String events = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -162,7 +162,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .吃
-        else if (Pattern.compile("^.吃什么|^.吃撒子|^.恰啥").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.吃什么|^\\.吃撒子|^\\.恰啥").matcher(rContent).find()) {
             if (RollUtil.iRoll(10) > 5) {
                 result = foodList.get(RollUtil.iRoll(foodList.size() - 1));
             } else {
@@ -171,7 +171,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         //  .抽签
-        else if (Pattern.compile("^.抽签").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.抽签").matcher(rContent).find()) {
             int rNum = iEventService.countAll();
             int chouQianNum = RollUtil.iRoll(rNum);
             int chouQianNumNum = RollUtil.iRoll(rNum);
@@ -214,8 +214,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .login  你的名字
-        else if (Pattern.compile("^.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
+        else if (Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(1);
             YysDearfriend dearfriend = new YysDearfriend();
@@ -231,7 +231,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .摸lv
-        else if (Pattern.compile("^.摸$").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.摸$").matcher(rContent).find()) {
 
             YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
             Integer lv = fish.getFishLv() + fish.getBonusLv();
@@ -288,8 +288,8 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         // .除你fish/.expellifish
-        else if (Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
+        else if (Pattern.compile("^\\.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(2);
             ExpellifishEvent event = iExpellifishEventService.getEvent();
@@ -306,7 +306,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         //  .日摸量
-        else if (Pattern.compile("^.日摸量").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.日摸量").matcher(rContent).find()) {
             Map<String, Object> param = iYysFishDailyService.touchToday();
             Integer tt = (Integer) param.get("TT");
             String tk = (String) param.get("TK");
@@ -322,8 +322,8 @@ public class SheSayServiceImpl implements SheSayService {
 //        }
 
         //  .send
-        else if (Pattern.compile("^.send\\s*([a-zA-Z0-9,.，。？！、\\s\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-            Matcher matcher = Pattern.compile("^.send\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
+        else if (Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.，。？！、\\s\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
             matcher.find();
             String s = matcher.group(1);
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
@@ -336,7 +336,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         //.draw
-        else if (Pattern.compile("^.draw$").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.draw$").matcher(rContent).find()) {
             DicyDict tarot = iDicyDictService.rollByDict("tarot");
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
             String replace = tarot.getValue().replace(":", ":\n");
@@ -345,7 +345,7 @@ public class SheSayServiceImpl implements SheSayService {
         }
 
         //.draw 圣三角牌阵
-        else if (Pattern.compile("^.draw\\s*圣三角牌阵$").matcher(rContent).find()) {
+        else if (Pattern.compile("^\\.draw\\s*圣三角牌阵$").matcher(rContent).find()) {
             List<DicyDict> tarot = iDicyDictService.holyTriangle();
             String name = iYysDearfriendService.check(wechatReceiveMsg.getId1());
             result = name + "抽到了:\n";
@@ -354,7 +354,7 @@ public class SheSayServiceImpl implements SheSayService {
             result += "将来的预测："  + tarot.get(2).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位");
         }
 
-//        else if (Pattern.compile("^.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
+//        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
 //            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
 //            matcher.find();
 //            String s = matcher.group(1);

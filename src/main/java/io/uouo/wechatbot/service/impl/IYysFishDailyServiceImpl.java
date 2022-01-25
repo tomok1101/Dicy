@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -77,13 +76,16 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         );
         Integer touchToday = 0;
         String touchKing = "";
+        List<Integer> lvs = new LinkedList<>();
         if (ObjectUtil.isNotEmpty(list)){
             for (YysFishDaily fish :
                     list) {
                 touchToday += fish.getFishLv() == null ? 0 : fish.getFishLv();
-                touchKing = list.get(0).getWxid();
+                lvs.add(fish.getFishLv() + fish.getBonusLv());
             }
         }
+        touchKing = list.get(lvs.indexOf(Collections.max(lvs))).getWxid();
+
         if (!"".equals(touchKing)){
             YysDearfriend dearfriend = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid,touchKing));
             if (ObjectUtil.isNotEmpty(dearfriend)){

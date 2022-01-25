@@ -8,6 +8,8 @@ import io.uouo.wechatbot.service.IYysDearfriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class IYysDearfriendServiceImpl implements IYysDearfriendService {
     @Autowired
@@ -22,7 +24,7 @@ public class IYysDearfriendServiceImpl implements IYysDearfriendService {
 
     @Override
     public boolean add(YysDearfriend dearfriend) {
-        YysDearfriend oldDear = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda()
+        List<YysDearfriend> oldDear = dearfriendMapper.selectList(new QueryWrapper<YysDearfriend>().lambda()
                 .eq(YysDearfriend::getWxid,dearfriend.getWxid()).or().eq(YysDearfriend::getNickname,dearfriend.getNickname())
         );
         if (ObjectUtil.isNotEmpty(oldDear)){
