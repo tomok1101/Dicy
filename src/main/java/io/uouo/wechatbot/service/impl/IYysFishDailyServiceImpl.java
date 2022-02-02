@@ -41,10 +41,17 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
             Calendar cal = Calendar.getInstance();
             Date date = new Date();
             cal.setTime(date);
+
+            Calendar end = Calendar.getInstance();
+            end.set(2022,2,7);
+
             int w = cal.get(Calendar.DAY_OF_WEEK);
-            if (w == 1 || w == 7){
+            if (cal.before(end)){
                 yysFishDaily.setExpellifish(5);
-            }else {
+            }else if (w == 1 || w == 7){
+                yysFishDaily.setExpellifish(8);
+            }
+            else {
                 yysFishDaily.setExpellifish(1);
             }
             yysFishDaily.setDate(date);
@@ -118,11 +125,17 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
             param.put("status","null");
             return param;
         }
-        badMan.setExpellifish(badMan.getExpellifish()-1);
         int i = RollUtil.iRoll(damage);
-        poorMan.setBonusLv(poorMan.getBonusLv() + i);
-        fishDailyMapper.updateById(poorMan);
-        fishDailyMapper.updateById(badMan);
+        if (poorMan.getWxid().equals(badMan.getWxid())){
+            badMan.setExpellifish(badMan.getExpellifish()-1);
+            badMan.setBonusLv(poorMan.getBonusLv() + i);
+            fishDailyMapper.updateById(badMan);
+        }else {
+            badMan.setExpellifish(badMan.getExpellifish()-1);
+            poorMan.setBonusLv(poorMan.getBonusLv() + i);
+            fishDailyMapper.updateById(badMan);
+            fishDailyMapper.updateById(poorMan);
+        }
         param.put("status","headShot");
         param.put("damage",i);
         return param;

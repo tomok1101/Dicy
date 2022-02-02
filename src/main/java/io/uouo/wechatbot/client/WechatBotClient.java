@@ -81,7 +81,7 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
             //图灵测试
             if (wechatReceiveMsg.getWxid().equals("24355601674@chatroom") || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21") || wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) {
                 //闭群
-                if (wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) { return; }
+//                if (wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) { return; }
                 sheSay.sheReplying(wechatReceiveMsg);
             }
         }
