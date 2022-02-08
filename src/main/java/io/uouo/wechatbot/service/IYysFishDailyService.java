@@ -18,4 +18,7 @@ public interface IYysFishDailyService {
     //除你fish
     Map<String, Object> expellifish(String wxid, String nickname, Integer damage);
 
+    //阿瓦达阿巴巴
+    Map<String, Object> AvadaABaBa(String id1, String nickname, Integer max);
+
 }

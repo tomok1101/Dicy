@@ -8,15 +8,20 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("expellifish_event")
-public class ExpellifishEvent {
+@TableName("magic_event")
+public class MagicEvent {
     /**
      * id
      */
     private Integer id;
 
     /**
-     * 除你fish事件
+     * type
+     */
+    private String type;
+
+    /**
+     * 马猴事件
      */
     private String fishEvent;
 
@@ -24,4 +29,9 @@ public class ExpellifishEvent {
      * 伤害上限
      */
     private Integer max;
+
+    /**
+     * 伤害下限
+     */
+    private Integer min;
 }

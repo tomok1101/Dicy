@@ -141,4 +141,9 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         return param;
     }
 
+    @Override
+    public Map<String, Object> AvadaABaBa(String id1, String nickname, Integer max) {
+        return null;
+    }
+
 }

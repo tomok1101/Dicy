@@ -49,7 +49,7 @@ public class SheSayServiceImpl implements SheSayService {
     private IDicyDictService iDicyDictService;
 
     @Autowired
-    private IExpellifishEventService iExpellifishEventService;
+    private IMagicEventService iMagicEventService;
 
     @Override
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
@@ -74,7 +74,7 @@ public class SheSayServiceImpl implements SheSayService {
             result += "| 8 .日摸量 | 不会大家都在工作吧？不会吧\n";
             result += "| 9 .draw | 抽一张塔罗牌\n";
             result += "| 10 .draw 圣三角牌阵 | 抽三张塔罗牌放置在圣三角牌阵\n";
-            result += "| 0 .send+意见 | 笨比开发tom能力有限，\n希望提出正经宝贵意见和想要的功能！\n";
+            result += "| 0 .send+意见 | 希望提出正经宝贵意见和想要的功能！\n";
             result += "| 谢谢你跟骰娘聊天，希望你摸鱼一下休息开心( •̀ ω •́ )✧\n";
             result += "| ps：诚招除你fish事件\n";
 
@@ -292,7 +292,7 @@ public class SheSayServiceImpl implements SheSayService {
             Matcher matcher = Pattern.compile("^\\.(除你fish|expellifish)\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
             matcher.find();
             String nickname = matcher.group(2);
-            ExpellifishEvent event = iExpellifishEventService.getEvent();
+            MagicEvent event = iMagicEventService.getEvent();
             Map<String, Object> expellifish = iYysFishDailyService.expellifish(wechatReceiveMsg.getId1(), nickname, event.getMax());
             if ("miss".equals(expellifish.get("status"))){
                 //瞄错了
@@ -301,6 +301,24 @@ public class SheSayServiceImpl implements SheSayService {
                 result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
             }else {
                 result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
+            }
+
+        }
+
+        // .AvadaABaBa
+        else if (Pattern.compile("^\\.AvadaABaBa\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
+            Matcher matcher = Pattern.compile("^\\.AvadaABaBa\\s*([a-zA-Z0-9,.，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
+            matcher.find();
+            String nickname = matcher.group(1);
+            MagicEvent event = iMagicEventService.getEvent();
+            Map<String, Object> AvadaABaBa = iYysFishDailyService.AvadaABaBa(wechatReceiveMsg.getId1(), nickname, event.getMax());
+            if ("miss".equals(AvadaABaBa.get("status"))){
+                //瞄错了
+                result = "请瞄准再打...";
+            }else if("null".equals(AvadaABaBa.get("status"))){
+                result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
+            }else {
+                result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) AvadaABaBa.get("damage")));
             }
 
         }
