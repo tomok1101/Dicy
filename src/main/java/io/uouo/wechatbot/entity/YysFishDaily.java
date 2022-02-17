@@ -50,4 +50,9 @@ public class YysFishDaily {
      */
     private Integer expellifish;
 
+    /**
+     * 阿瓦达香蕉
+     */
+    private Integer avadabanana;
+
 }

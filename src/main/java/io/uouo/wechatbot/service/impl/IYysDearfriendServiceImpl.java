@@ -17,9 +17,9 @@ public class IYysDearfriendServiceImpl implements IYysDearfriendService {
 
 
     @Override
-    public String check(String wxid) {
+    public YysDearfriend check(String wxid) {
         YysDearfriend yysDearfriend = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid,wxid));
-        return yysDearfriend == null?"那个谁":yysDearfriend.getNickname();
+        return yysDearfriend;
     }
 
     @Override

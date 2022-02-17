@@ -1,5 +1,6 @@
 package io.uouo.wechatbot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.entity.MagicEvent;
 import io.uouo.wechatbot.mapper.MagicEventMapper;
@@ -17,8 +18,15 @@ public class IMagicEventServiceImpl implements IMagicEventService {
 
 
     @Override
-    public MagicEvent getEvent() {
-        List<MagicEvent> MagicEvents = MagicEventMapper.selectList(null);
+    public MagicEvent getExpellifishEvent() {
+        List<MagicEvent> MagicEvents = MagicEventMapper.selectList(new QueryWrapper<MagicEvent>().lambda().eq(MagicEvent::getType,"expellifish"));
+        int i = RollUtil.iRoll(MagicEvents.size())-1;
+        return MagicEvents.get(i);
+    }
+
+    @Override
+    public MagicEvent getAvadaBananaEvent() {
+        List<MagicEvent> MagicEvents = MagicEventMapper.selectList(new QueryWrapper<MagicEvent>().lambda().eq(MagicEvent::getType,"avadabanana"));
         int i = RollUtil.iRoll(MagicEvents.size())-1;
         return MagicEvents.get(i);
     }
