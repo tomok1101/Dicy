@@ -16,7 +16,7 @@ public interface IYysFishDailyService {
     Map<String, Object> touchToday();
 
     //施法
-    Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min);
+    Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min, String type);
 
 
 }

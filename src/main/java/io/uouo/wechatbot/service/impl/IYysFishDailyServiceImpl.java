@@ -54,21 +54,20 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
             Calendar c = Calendar.getInstance();
             c.add(Calendar.DAY_OF_MONTH, -1);
             Date yesterday = c.getTime();
-
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String yesterdayString = formatter.format(yesterday);
             List<YysFishDaily> yesterdayFishs = fishDailyMapper.selectList(new QueryWrapper<YysFishDaily>().lambda()
-                    .eq(YysFishDaily::getWxid, wxid)
-                    .eq(YysFishDaily::getDate, yesterday)
+                    .eq(YysFishDaily::getDate, yesterdayString)
             );
-            String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
-
-            String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
 
             List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
 
             //昨日摸鱼量
-            if (ObjectUtil.isNull(myFish)){
+            if (myFish.size() == 0){
                 yysFishDaily.setExpellifish(0);
+                yysFishDaily.setAvadabanana(0);
             }else {
+                //发放奖励
                 YysFishDaily yesterdayFish = myFish.get(0);
                 if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30){
                     yysFishDaily.setExpellifish(1);
@@ -81,6 +80,9 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                 }else {
                     yysFishDaily.setExpellifish(4);
                 }
+
+                String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
+                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
                 if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)){
                     yysFishDaily.setAvadabanana(1);
                 }
@@ -107,39 +109,38 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
     @Override
     public Map<String, Object> touchToday() {
-
+        //总
         List<YysFishDaily> list = fishDailyMapper.selectList(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getDate, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))
-                .orderByDesc(YysFishDaily::getFishLv)
         );
+
+        //总摸量
         Integer touchToday = 0;
         String touchKing = "";
+        String touchICU = "";
         List<Integer> lvs = new LinkedList<>();
         if (ObjectUtil.isNotEmpty(list)) {
             for (YysFishDaily fish :
                     list) {
-                touchToday += fish.getFishLv() == null ? 0 : fish.getFishLv();
                 lvs.add(fish.getFishLv() + fish.getBonusLv());
             }
+            touchToday = list.stream().collect(Collectors.summingInt(YysFishDaily::getFishLv));
+            touchKing = list.get(lvs.indexOf(Collections.max(lvs))).getNickname();
+            touchICU = list.get(lvs.indexOf(Collections.min(lvs))).getNickname();
         }
-        touchKing = list.get(lvs.indexOf(Collections.max(lvs))).getWxid();
 
-        if (!"".equals(touchKing)) {
-            YysDearfriend dearfriend = dearfriendMapper.selectOne(new QueryWrapper<YysDearfriend>().lambda().eq(YysDearfriend::getWxid, touchKing));
-            if (ObjectUtil.isNotEmpty(dearfriend)) {
-                touchKing = dearfriend.getNickname();
-            }
-        }
+
         Map<String, Object> param = new HashMap<>();
         param.put("TT", touchToday);
         param.put("TK", touchKing);
+        param.put("TI", touchICU);
         param.put("TM", list.size());
 
         return param;
     }
 
     @Override
-    public Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min) {
+    public Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min, String type) {
         Map<String, Object> param = new HashMap<>();
         //目标
         YysFishDaily poorMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
@@ -162,23 +163,32 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         }
 
         //没子弹
-        if (badMan.getExpellifish() == 0) {
-            param.put("status", "null");
-            return param;
+        if (type.equals("avadabanana")){
+            if (badMan.getAvadabanana() == 0) {
+                param.put("status", "null");
+                return param;
+            }
+            badMan.setAvadabanana(badMan.getAvadabanana() - 1);
         }
+        else if (type.equals("expellifish")){
+            if (badMan.getExpellifish() == 0) {
+                param.put("status", "null");
+                return param;
+            }
+            badMan.setExpellifish(badMan.getExpellifish() - 1);
+        }
+
 
         //boom!
         int i = RollUtil.a2bRoll(min, max);
         if (poorMan.getWxid().equals(badMan.getWxid())) {
-            badMan.setExpellifish(badMan.getExpellifish() - 1);
             badMan.setBonusLv(poorMan.getBonusLv() + i);
-            fishDailyMapper.updateById(badMan);
         } else {
-            badMan.setExpellifish(badMan.getExpellifish() - 1);
             poorMan.setBonusLv(poorMan.getBonusLv() + i);
-            fishDailyMapper.updateById(badMan);
             fishDailyMapper.updateById(poorMan);
         }
+
+        fishDailyMapper.updateById(badMan);
         param.put("status", "headShot");
         param.put("damage", i);
         return param;
