@@ -85,6 +85,8 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                 String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
                 if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)){
                     yysFishDaily.setAvadabanana(1);
+                }else {
+                    yysFishDaily.setAvadabanana(0);
                 }
             }
 
