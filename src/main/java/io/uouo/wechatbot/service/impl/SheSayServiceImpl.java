@@ -237,60 +237,61 @@ public class SheSayServiceImpl implements SheSayService {
         else if (Pattern.compile("^\\.摸$").matcher(rContent).find()) {
 
             YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
-            Integer lv = fish.getFishLv() + fish.getBonusLv();
-            Integer expellifish = fish.getExpellifish();
-            Integer avadabanana = fish.getAvadabanana();
-            YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-            if (dearfriend == null){
+            if (fish == null){
                 result = "请先签订契约";
-            }
-            else if (lv < 0){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，社会主义的终极敌人......您要么是资本の狂热信徒，要么是被创了，为什么被创反思自己的所作所为哦，摸出成就“资本与创伤”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv <= 5){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，就这，你管这叫摸鱼？老板赚疯了！\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 15){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 30){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您战战兢兢，摸出成就“逐渐步入正轨啦”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 50){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您小有心得，摸出成就“摸鱼新手-十里坡剑圣”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 75){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 105){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 140){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 180){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您就是高，摸出成就“摸鱼高级-摸鱼达人”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 225){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 270){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 325){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 380){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 445){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else if (lv < 515){
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
-            }
-            else{
-                result = "检测到" + dearfriend.getNickname() + "摸鱼级别为Lv_" + lv + "，究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+            } else {
+                Integer lv = fish.getFishLv() + fish.getBonusLv();
+                Integer expellifish = fish.getExpellifish();
+                Integer avadabanana = fish.getAvadabanana();
+
+                if (lv < 0){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，社会主义的终极敌人......您要么是资本の狂热信徒，要么是被创了，为什么被创反思自己的所作所为哦，摸出成就“资本与创伤”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv <= 5){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，就这，你管这叫摸鱼？老板赚疯了！\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 15){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 30){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您战战兢兢，摸出成就“逐渐步入正轨啦”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 50){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您小有心得，摸出成就“摸鱼新手-十里坡剑圣”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 75){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 105){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 140){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 180){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您就是高，摸出成就“摸鱼高级-摸鱼达人”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 225){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 270){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 325){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 380){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 445){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else if (lv < 515){
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
+                else{
+                    result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "，究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”\nexpellifish -> 【" + expellifish + "】\na@#daB&na^a >【" + avadabanana +"】";
+                }
             }
         }
 
