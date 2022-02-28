@@ -1,5 +1,6 @@
 package io.uouo.wechatbot.service;
 
+import io.uouo.wechatbot.entity.SpellEvent;
 import io.uouo.wechatbot.entity.YysFishDaily;
 
 import java.util.Map;
@@ -16,7 +17,7 @@ public interface IYysFishDailyService {
     Map<String, Object> touchToday();
 
     //施法
-    Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min, String type);
+    Map<String, Object> spellcasting(String wxid, String nickname, SpellEvent event, String type);
 
 
 }

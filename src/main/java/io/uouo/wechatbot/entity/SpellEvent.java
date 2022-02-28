@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("magic_event")
-public class MagicEvent {
+@TableName("spell_event")
+public class SpellEvent {
     /**
      * id
      */

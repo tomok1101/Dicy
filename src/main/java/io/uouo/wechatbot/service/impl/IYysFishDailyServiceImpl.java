@@ -3,8 +3,11 @@ package io.uouo.wechatbot.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.uouo.wechatbot.common.util.RollUtil;
+import io.uouo.wechatbot.entity.SpellEvent;
+import io.uouo.wechatbot.entity.SpellcastingLog;
 import io.uouo.wechatbot.entity.YysDearfriend;
 import io.uouo.wechatbot.entity.YysFishDaily;
+import io.uouo.wechatbot.mapper.SpellcastingLogMapper;
 import io.uouo.wechatbot.mapper.YysDearfriendMapper;
 import io.uouo.wechatbot.mapper.YysFishDailyMapper;
 import io.uouo.wechatbot.service.IYysFishDailyService;
@@ -24,6 +27,9 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
     @Autowired
     private YysDearfriendMapper dearfriendMapper;
+
+    @Autowired
+    private SpellcastingLogMapper spellcastingLogMapper;
 
     @Override
     public void touch(String wxid) {
@@ -142,7 +148,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     }
 
     @Override
-    public Map<String, Object> spellcasting(String wxid, String nickname, Integer max, Integer min, String type) {
+    public Map<String, Object> spellcasting(String wxid, String nickname, SpellEvent event, String type) {
         Map<String, Object> param = new HashMap<>();
         //目标
         YysFishDaily poorMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
@@ -182,15 +188,23 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
 
         //boom!
-        int i = RollUtil.a2bRoll(min, max);
+        int i = RollUtil.a2bRoll(event.getMin(), event.getMax());
         if (poorMan.getWxid().equals(badMan.getWxid())) {
             badMan.setBonusLv(poorMan.getBonusLv() + i);
         } else {
             poorMan.setBonusLv(poorMan.getBonusLv() + i);
             fishDailyMapper.updateById(poorMan);
         }
-
         fishDailyMapper.updateById(badMan);
+
+        //施法日志
+        SpellcastingLog log = new SpellcastingLog();
+        log.setSpellId(event.getId());
+        log.setBadmanWxid(badMan.getWxid());
+        log.setPoormanWxid(poorMan.getWxid());
+        log.setCreateTime(new Date());
+        spellcastingLogMapper.insert(log);
+
         param.put("status", "headShot");
         param.put("damage", i);
         return param;
