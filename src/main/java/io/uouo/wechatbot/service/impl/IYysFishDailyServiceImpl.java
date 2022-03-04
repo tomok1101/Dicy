@@ -89,11 +89,15 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
                 String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
                 String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
-                if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)){
+                if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)) {
                     yysFishDaily.setAvadabanana(1);
-                }else {
+                } else {
                     yysFishDaily.setAvadabanana(0);
                 }
+
+                //昨天子弹累加
+                yysFishDaily.setExpellifish(yysFishDaily.getExpellifish() + yesterdayFish.getExpellifish());
+                yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
             }
 
             fishDailyMapper.insert(yysFishDaily);
@@ -171,12 +175,18 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         }
 
         //没子弹
-        if (type.equals("avadabanana")){
-            if (badMan.getAvadabanana() == 0) {
+        if (type.equals("avadabanana")) {
+            if (badMan.getAvadabanana() == 0 || badMan.getExpellifish() < 10) {
                 param.put("status", "null");
                 return param;
             }
-            badMan.setAvadabanana(badMan.getAvadabanana() - 1);
+            //扣子弹
+            if (badMan.getAvadabanana() > 0) {
+                badMan.setAvadabanana(badMan.getAvadabanana() - 1);
+            } else if (badMan.getExpellifish() >= 10) {
+                badMan.setExpellifish(badMan.getExpellifish() - 10);
+            }
+
         }
         else if (type.equals("expellifish")){
             if (badMan.getExpellifish() == 0) {
@@ -189,6 +199,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
         //boom!
         int i = RollUtil.a2bRoll(event.getMin(), event.getMax());
+        //创自己
         if (poorMan.getWxid().equals(badMan.getWxid())) {
             badMan.setBonusLv(poorMan.getBonusLv() + i);
         } else {
