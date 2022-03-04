@@ -176,7 +176,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
         //没子弹
         if (type.equals("avadabanana")) {
-            if (badMan.getAvadabanana() == 0 || badMan.getExpellifish() < 10) {
+            if (badMan.getAvadabanana() == 0 && badMan.getExpellifish() < 10) {
                 param.put("status", "null");
                 return param;
             }
