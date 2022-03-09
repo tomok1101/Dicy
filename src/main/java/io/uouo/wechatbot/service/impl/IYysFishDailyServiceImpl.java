@@ -67,29 +67,27 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
             );
 
             List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
-
+            String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
+            String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
+            YysFishDaily yesterdayFish = myFish.get(0);
             //昨日摸鱼量
-            if (myFish.size() == 0){
+            if (myFish.size() == 0 || yesterdayFish.getWxid().equals(fishBones)) {
                 yysFishDaily.setExpellifish(0);
                 yysFishDaily.setAvadabanana(0);
-            }else {
+            } else {
                 //发放奖励
-                YysFishDaily yesterdayFish = myFish.get(0);
-                if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30){
+                if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30) {
                     yysFishDaily.setExpellifish(1);
-                }
-                else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60){
+                } else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60) {
                     yysFishDaily.setExpellifish(2);
-                }
-                else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180){
+                } else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180) {
                     yysFishDaily.setExpellifish(3);
-                }else {
+                } else {
                     yysFishDaily.setExpellifish(4);
                 }
 
-                String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
-                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
-                if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)) {
+                //发放摸鱼王奖励
+                if (yesterdayFish.getWxid().equals(fishKing)) {
                     yysFishDaily.setAvadabanana(1);
                 } else {
                     yysFishDaily.setAvadabanana(0);

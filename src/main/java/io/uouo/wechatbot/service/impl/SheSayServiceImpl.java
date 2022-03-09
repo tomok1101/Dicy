@@ -269,7 +269,7 @@ public class SheSayServiceImpl implements SheSayService {
 
             YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
             if (fish == null){
-                result = "请先签订契约";
+                result = "请先签订契约，格式.login 名字";
             } else {
                 Integer lv = fish.getFishLv() + fish.getBonusLv();
                 Integer expellifish = fish.getExpellifish();
