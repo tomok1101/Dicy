@@ -66,44 +66,51 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                     .eq(YysFishDaily::getDate, yesterdayString)
             );
 
-            List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
-            String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
-            String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
+            if (yesterdayFishs != null && yesterdayFishs.size() != 0) {
+                List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
+                String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
+                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
 
-            //昨日摸鱼量
-            if (myFish.size() == 0) {
-                yysFishDaily.setExpellifish(0);
-                yysFishDaily.setAvadabanana(0);
-            } else {
-                //发放奖励
-                YysFishDaily yesterdayFish = myFish.get(0);
-                if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30) {
-                    yysFishDaily.setExpellifish(1);
-                } else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60) {
-                    yysFishDaily.setExpellifish(2);
-                } else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180) {
-                    yysFishDaily.setExpellifish(3);
-                } else {
-                    yysFishDaily.setExpellifish(4);
-                }
-
-                //发放摸鱼王奖励
-                if (yesterdayFish.getWxid().equals(fishKing)) {
-                    yysFishDaily.setAvadabanana(1);
-                } else {
-                    yysFishDaily.setAvadabanana(0);
-                }
-
-                //昨天子弹累加
-                yysFishDaily.setExpellifish(yysFishDaily.getExpellifish() + yesterdayFish.getExpellifish());
-                yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
-
-                //清空icu患者数据
-                if (yesterdayFish.getWxid().equals(fishBones)) {
+                //昨日摸鱼量
+                if (myFish.size() == 0) {
                     yysFishDaily.setExpellifish(0);
                     yysFishDaily.setAvadabanana(0);
+                } else {
+                    //发放奖励
+                    YysFishDaily yesterdayFish = myFish.get(0);
+                    if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30) {
+                        yysFishDaily.setExpellifish(1);
+                    } else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60) {
+                        yysFishDaily.setExpellifish(2);
+                    } else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180) {
+                        yysFishDaily.setExpellifish(3);
+                    } else {
+                        yysFishDaily.setExpellifish(4);
+                    }
+
+                    //发放摸鱼王奖励
+                    if (yesterdayFish.getWxid().equals(fishKing)) {
+                        yysFishDaily.setAvadabanana(1);
+                    } else {
+                        yysFishDaily.setAvadabanana(0);
+                    }
+
+                    //昨天子弹累加
+                    yysFishDaily.setExpellifish(yysFishDaily.getExpellifish() + yesterdayFish.getExpellifish());
+                    yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
+
+                    //清空icu患者数据
+                    if (yesterdayFish.getWxid().equals(fishBones)) {
+                        yysFishDaily.setExpellifish(0);
+                        yysFishDaily.setAvadabanana(0);
+                    }
                 }
+
+            } else {
+                yysFishDaily.setExpellifish(0);
+                yysFishDaily.setAvadabanana(0);
             }
+
 
             fishDailyMapper.insert(yysFishDaily);
         } else {
