@@ -2,9 +2,11 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 123456
-    url: jdbc:mysql://8.131.79.117:3306/dicy?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: tom
+    password: Dicy1101.
+    #    url: jdbc:mysql://8.131.79.117:3306/dicy?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/dicy?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+
 
 # tomcat接口地址访问地址
 server:
