@@ -349,6 +349,8 @@ public class SheSayServiceImpl implements SheSayService {
                     result = "请瞄准再打...";
                 } else if ("null".equals(expellifish.get("status"))) {
                     result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
+                } else if ("luckyShot".equals(expellifish.get("status"))) {
+                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage"))) + "\n【add AWADA success.】";
                 } else {
                     result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
                 }
@@ -405,7 +407,6 @@ public class SheSayServiceImpl implements SheSayService {
                 result = "您的意见收到！骰娘使命必达！下次一定改！";
             }
 
-
 //        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
 //            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
 //            matcher.find();
@@ -413,17 +414,14 @@ public class SheSayServiceImpl implements SheSayService {
 //
 //        }
 
-            //汤の任务
-            else if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
-                result = wechatReceiveMsg.getContent();
-                replyMsg.setWxid("18929140647@chatroom");
-            } else {
+            else {
                 return;
             }
 
             replyMsg.setContent(result);
             wechatBotService.sendTextMsg(replyMsg);
         }
+
         //图片回复
         else if (Pattern.compile("^#").matcher(rContent).find()) {
 
@@ -436,6 +434,14 @@ public class SheSayServiceImpl implements SheSayService {
 
 
             wechatBotService.sendImgMsg(replyMsg);
+        }
+
+        //汤回复
+        else if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
+            String result = wechatReceiveMsg.getContent();
+            replyMsg.setWxid("18929140647@chatroom");
+            replyMsg.setContent(result);
+            wechatBotService.sendTextMsg(replyMsg);
         }
 
     }
