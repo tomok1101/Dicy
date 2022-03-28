@@ -78,8 +78,9 @@ public class SheSayServiceImpl implements SheSayService {
                 result += "| 8 .日摸量             | 不会大家都在工作吧？不会吧\n";
                 result += "| 9 .draw               | 你的回合，抽卡！\n";
                 result += "| 10 .draw 圣三角牌阵    | 抽三张塔罗牌放置在圣三角牌阵\n";
+                result += "| 11 .欢迎 #本群要素 .政审 | 一进三连！\n";
                 result += "| 0 .send+意见          | 欢迎正经意见和想要的功能！\n";
-                result += "| 谢谢你跟骰娘聊天，希望你摸鱼一下休息开心( •̀ ω •́ )✧\n";
+                result += "| 谢谢你跟骰娘聊天，希望你休息一下摸鱼开心( •̀ ω •́ )✧\n";
 
             }
 
@@ -99,7 +100,7 @@ public class SheSayServiceImpl implements SheSayService {
                 if ((times > 99) || (points > 9999) || times <= 0 || points <= 0) {
                     result = "不许乱骰！";
                 } else {
-                    result = "投掷点数 -> ";
+                    result = "点数-> ";
                     for (int i = 0; i < times; i++) {
                         if (i != times - 1) {
                             result = result + RollUtil.iRoll(times) + ", ";
@@ -350,7 +351,7 @@ public class SheSayServiceImpl implements SheSayService {
                 } else if ("null".equals(expellifish.get("status"))) {
                     result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
                 } else if ("luckyShot".equals(expellifish.get("status"))) {
-                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage"))) + "\n【add AWADA success.】";
+                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage"))) + "\n[ADD_AVADA SUCCESS;]";
                 } else {
                     result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
                 }
