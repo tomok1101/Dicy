@@ -18,9 +18,9 @@ public class IDicyDictServiceImpl implements IDicyDictService {
 
 
     @Override
-    public DicyDict rollByDict(String type) {
+    public DicyDict rollByDict(String code) {
         List<DicyDict> dict = dicyDictMapper.selectList(new QueryWrapper<DicyDict>().lambda()
-                .eq(DicyDict::getCode, type)
+                .eq(DicyDict::getCode, code)
                 .orderByAsc(DicyDict::getSort));
         int i = RollUtil.iRoll(dict.size()) - 1;
         return dict.get(i);
@@ -46,4 +46,14 @@ public class IDicyDictServiceImpl implements IDicyDictService {
         dicts.add(dictList.get(i3));
         return dicts;
     }
+
+    @Override
+    public List<DicyDict> getListByType(String code) {
+        List<DicyDict> dict = dicyDictMapper.selectList(new QueryWrapper<DicyDict>().lambda()
+                .eq(DicyDict::getCode, code)
+                .orderByAsc(DicyDict::getSort));
+        return dict;
+    }
+
+
 }

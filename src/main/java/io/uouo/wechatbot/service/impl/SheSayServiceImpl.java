@@ -1,9 +1,11 @@
 package io.uouo.wechatbot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
 import io.uouo.wechatbot.entity.*;
+import io.uouo.wechatbot.mapper.YysDestinyMapper;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,6 +53,9 @@ public class SheSayServiceImpl implements SheSayService {
 
     @Autowired
     private ISpellEventService iSpellEventService;
+
+    @Autowired
+    private IYysDestinyService iYysDestinyService;
 
     @Override
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
@@ -187,44 +193,13 @@ public class SheSayServiceImpl implements SheSayService {
 
             //  .抽签
             else if (Pattern.compile("^\\.抽签").matcher(rContent).find()) {
-
-                //词缀
-                String fate;
-
-                int fatePoint = RollUtil.hundredRoll();
-                //大成功or大失败 直接过
-                if (fatePoint <= 5 || fatePoint >= 95) {
-                    if (fatePoint <= 5) {
-                        fate = "\uD83C\uDF8A欧皇[庆祝]";
-                    } else {
-                        fate = "\uD83E\uDD2F非酋\uD83C\uDF1A";
-                    }
-                } else {
-                    //前缀
-                    if (fatePoint <= 15) {
-                        fate = "大";
-                    } else if (fatePoint <= 35) {
-                        fate = "中";
-                    } else if (fatePoint <= 50) {
-                        fate = "小";
-                    } else {
-                        fate = "末";
-                    }
-
-                    if (RollUtil.hundredRoll() >= 50) {
-                        fate += "吉";
-                    } else {
-                        fate += "凶";
-                    }
-                }
-
-
-                //
+                YysDestiny destiny = iYysDestinyService.destiny(wechatReceiveMsg.getId1());
 
                 result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
-                        "摸の運 • 【" + fate + "】\n" +
-//                        " 宜：" + iEventService.selectByid(chouQianNum).getEvent() + "、" + iEventService.selectByid(chouQianNumNum).getEvent() + "\n" +
-                        "今日有缘游戏：《" + iGameService.selectByid(RollUtil.iRoll(iGameService.countAll())).getGame() + "》来，试试看吧！";
+                        "摸の運 • 【" + destiny.getDestiny() + "】\n" +
+                        "\uD83E\uDD70宜：" + destiny.getRise1() + "、" + destiny.getRise2() + "、" + destiny.getRise3() + "\n" +
+                        "☠忌：" + destiny.getFall1() + "、" + destiny.getFall2() + "、" + destiny.getFall3() + "\n" +
+                        "今日有缘游戏：《" + destiny.getGame()  + "》来，试试看吧！";
             }
 
             //.draw

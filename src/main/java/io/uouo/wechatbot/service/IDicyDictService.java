@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface IDicyDictService {
 
-    DicyDict rollByDict(String type);
+    DicyDict rollByDict(String code);
 
     List<DicyDict> holyTriangle();
+
+    List<DicyDict> getListByType(String code);
 }
