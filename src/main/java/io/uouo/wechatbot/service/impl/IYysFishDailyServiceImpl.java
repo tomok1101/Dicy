@@ -66,39 +66,52 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                     .eq(YysFishDaily::getDate, yesterdayString)
             );
 
-            List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
+            if (yesterdayFishs != null && yesterdayFishs.size() != 0) {
+                List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
+                yesterdayFishs.forEach(e -> e.setLv(e.getFishLv() + e.getBonusLv()));
+                String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getLv)).get().getWxid();
+                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getLv)).get().getWxid();
 
-            //昨日摸鱼量
-            if (myFish.size() == 0){
+                //昨日摸鱼量
+                if (myFish.size() == 0) {
+                    yysFishDaily.setExpellifish(0);
+                    yysFishDaily.setAvadabanana(0);
+                } else {
+                    //发放奖励
+                    YysFishDaily yesterdayFish = myFish.get(0);
+                    if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30) {
+                        yysFishDaily.setExpellifish(1);
+                    } else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60) {
+                        yysFishDaily.setExpellifish(2);
+                    } else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180) {
+                        yysFishDaily.setExpellifish(3);
+                    } else {
+                        yysFishDaily.setExpellifish(4);
+                    }
+
+                    //发放摸鱼王奖励
+                    if (yesterdayFish.getWxid().equals(fishKing)) {
+                        yysFishDaily.setAvadabanana(1);
+                    } else {
+                        yysFishDaily.setAvadabanana(0);
+                    }
+
+                    //昨天子弹累加
+                    yysFishDaily.setExpellifish(yysFishDaily.getExpellifish() + yesterdayFish.getExpellifish());
+                    yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
+
+                    //清空icu患者数据
+                    if (yesterdayFish.getWxid().equals(fishBones)) {
+                        yysFishDaily.setExpellifish(0);
+                        yysFishDaily.setAvadabanana(0);
+                    }
+                }
+
+            } else {
                 yysFishDaily.setExpellifish(0);
                 yysFishDaily.setAvadabanana(0);
-            }else {
-                //发放奖励
-                YysFishDaily yesterdayFish = myFish.get(0);
-                if (yesterdayFish.getFishLv() > 0 && yesterdayFish.getFishLv() <= 30){
-                    yysFishDaily.setExpellifish(1);
-                }
-                else if (yesterdayFish.getFishLv() > 30 && yesterdayFish.getFishLv() <= 60){
-                    yysFishDaily.setExpellifish(2);
-                }
-                else if (yesterdayFish.getFishLv() > 60 && yesterdayFish.getFishLv() <= 180){
-                    yysFishDaily.setExpellifish(3);
-                }else {
-                    yysFishDaily.setExpellifish(4);
-                }
-
-                String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getFishLv)).get().getWxid();
-                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getBonusLv)).get().getWxid();
-                if (yesterdayFish.getWxid().equals(fishBones) || yesterdayFish.getWxid().equals(fishKing)) {
-                    yysFishDaily.setAvadabanana(1);
-                } else {
-                    yysFishDaily.setAvadabanana(0);
-                }
-
-                //昨天子弹累加
-                yysFishDaily.setExpellifish(yysFishDaily.getExpellifish() + yesterdayFish.getExpellifish());
-                yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
             }
+
 
             fishDailyMapper.insert(yysFishDaily);
         } else {
@@ -154,6 +167,9 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
     @Override
     public Map<String, Object> spellcasting(String wxid, String nickname, SpellEvent event, String type) {
         Map<String, Object> param = new HashMap<>();
+        param.put("status", "headShot");
+
+
         //目标
         YysFishDaily poorMan = fishDailyMapper.selectOne(new QueryWrapper<YysFishDaily>().lambda()
                 .eq(YysFishDaily::getNickname, nickname)
@@ -176,24 +192,35 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
 
         //没子弹
         if (type.equals("avadabanana")) {
-            if (badMan.getAvadabanana() == 0 && badMan.getExpellifish() < 10) {
+            if (badMan.getAvadabanana() == 0) {
                 param.put("status", "null");
                 return param;
             }
             //扣子弹
-            if (badMan.getAvadabanana() > 0) {
+            else if (badMan.getAvadabanana() > 0) {
                 badMan.setAvadabanana(badMan.getAvadabanana() - 1);
-            } else if (badMan.getExpellifish() >= 10) {
-                badMan.setExpellifish(badMan.getExpellifish() - 10);
             }
 
         }
-        else if (type.equals("expellifish")){
+        else if (type.equals("expellifish")) {
+            int amo = 1;
+
             if (badMan.getExpellifish() == 0) {
                 param.put("status", "null");
                 return param;
             }
-            badMan.setExpellifish(badMan.getExpellifish() - 1);
+
+            if (badMan.getExpellifish() >= 5) {
+                //抽奖
+                if (RollUtil.hundredRoll() < 25) {
+                    param.put("status", "luckyShot");
+                    badMan.setAvadabanana(badMan.getAvadabanana() + 1);
+                    amo += 4;
+                }
+            }
+
+            badMan.setExpellifish(badMan.getExpellifish() - amo);
+
         }
 
 
@@ -216,7 +243,6 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
         log.setCreateTime(new Date());
         spellcastingLogMapper.insert(log);
 
-        param.put("status", "headShot");
         param.put("damage", i);
         return param;
     }

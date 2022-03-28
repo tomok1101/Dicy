@@ -1,6 +1,7 @@
 package io.uouo.wechatbot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -54,5 +55,11 @@ public class YysFishDaily {
      * 阿瓦达香蕉
      */
     private Integer avadabanana;
+
+    /**
+     * 总等级
+     */
+    @TableField(exist = false)
+    private Integer lv;
 
 }

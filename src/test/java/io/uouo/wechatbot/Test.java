@@ -17,7 +17,7 @@ public class Test {
 
     public static void main(String[] args) {
         for (int i = 0; i < 100; i++) {
-            int dice =  (int)(Math.random() * 10 );
+            int dice = (int) (Math.random() * (-114 + 114 + 1) - 114);
             System.out.println(dice);
         }
     }
