@@ -187,14 +187,43 @@ public class SheSayServiceImpl implements SheSayService {
 
             //  .抽签
             else if (Pattern.compile("^\\.抽签").matcher(rContent).find()) {
-                int rNum = iEventService.countAll();
-                int chouQianNum = RollUtil.iRoll(rNum);
-                int chouQianNumNum = RollUtil.iRoll(rNum);
-                while (chouQianNum == chouQianNumNum) {
-                    chouQianNumNum = RollUtil.iRoll(rNum);
+
+                //词缀
+                String fate;
+
+                int fatePoint = RollUtil.hundredRoll();
+                //大成功or大失败 直接过
+                if (fatePoint <= 5 || fatePoint >= 95) {
+                    if (fatePoint <= 5) {
+                        fate = "\uD83C\uDF8A欧皇[庆祝]";
+                    } else {
+                        fate = "\uD83E\uDD2F非酋\uD83C\uDF1A";
+                    }
+                } else {
+                    //前缀
+                    if (fatePoint <= 15) {
+                        fate = "大";
+                    } else if (fatePoint <= 35) {
+                        fate = "中";
+                    } else if (fatePoint <= 50) {
+                        fate = "小";
+                    } else {
+                        fate = "末";
+                    }
+
+                    if (RollUtil.hundredRoll() >= 50) {
+                        fate += "吉";
+                    } else {
+                        fate += "凶";
+                    }
                 }
+
+
+                //
+
                 result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
-                        " 宜：" + iEventService.selectByid(chouQianNum).getEvent() + "、" + iEventService.selectByid(chouQianNumNum).getEvent() + "\n" +
+                        "摸の運 • 【" + fate + "】\n" +
+//                        " 宜：" + iEventService.selectByid(chouQianNum).getEvent() + "、" + iEventService.selectByid(chouQianNumNum).getEvent() + "\n" +
                         "今日有缘游戏：《" + iGameService.selectByid(RollUtil.iRoll(iGameService.countAll())).getGame() + "》来，试试看吧！";
             }
 
@@ -405,7 +434,7 @@ public class SheSayServiceImpl implements SheSayService {
                 suggestion.setNickname(name);
                 suggestion.setSuggestion(s);
                 iSuggestionService.send(suggestion);
-                result = "您的意见收到！骰娘使命必达！下次一定改！";
+                result = "意见收到！使命必达！下次一定！改！";
             }
 
 //        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
