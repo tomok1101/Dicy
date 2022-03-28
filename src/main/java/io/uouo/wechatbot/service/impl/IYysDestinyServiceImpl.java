@@ -114,7 +114,7 @@ public class IYysDestinyServiceImpl implements IYysDestinyService {
             yysDestiny.setRise3(ordinary.get(r2).getValue());
 
             //忌
-            DicyDict fallEvent = fall.get(RollUtil.iRoll(rise.size()) - 1);
+            DicyDict fallEvent = fall.get(RollUtil.iRoll(fall.size()) - 1);
             yysDestiny.setFall1(fallEvent.getValue());
             yysDestiny.setFall2(ordinary.get(f1).getValue());
             yysDestiny.setFall3(ordinary.get(f2).getValue());
