@@ -91,33 +91,43 @@ public class IYysDestinyServiceImpl implements IYysDestinyService {
             List<DicyDict> rise = typeMap.get("rise");
             List<DicyDict> ordinary = typeMap.get("ordinary");
             List<DicyDict> fall = typeMap.get("fall");
-            int r1, r2, f1, f2;
-            r1 = RollUtil.iRoll(ordinary.size())-1;
+            rise.addAll(ordinary);
+            fall.addAll(ordinary);
+
+            int r1, r2, r3, f1, f2, f3;
+
+            r1 = RollUtil.iRoll(rise.size())-1;
 
             do {
-                r2 = RollUtil.iRoll(ordinary.size())-1;
+                r2 = RollUtil.iRoll(rise.size())-1;
             }while (r2 == r1);
 
             do {
-                f1 = RollUtil.iRoll(ordinary.size())-1;
-            }while (f1 == r1 || f1 == r2);
+                r3 = RollUtil.iRoll(rise.size())-1;
+            }while (r3 == r1 || r3 == r2);
 
             do {
-                f2 = RollUtil.iRoll(ordinary.size())-1;
-            }while (f2 == r1 || f2 == r2 || f2 == f1);
+                f1 = RollUtil.iRoll(fall.size())-1;
+            }while (f1 == r1 || f1 == r2 || f1 == r3);
+
+            do {
+                f2 = RollUtil.iRoll(fall.size())-1;
+            }while (f2 == r1 || f2 == r2 || f2 == r3 || f2 == f1);
+
+            do {
+                f3 = RollUtil.iRoll(fall.size())-1;
+            }while (f3 == r1 || f3 == r2 || f3 == r3 || f3 == f1 || f3 == f2);
 
 
             //宜
-            DicyDict riseEvent = rise.get(RollUtil.iRoll(rise.size()) - 1);
-            yysDestiny.setRise1(riseEvent.getValue());
-            yysDestiny.setRise2(ordinary.get(r1).getValue());
-            yysDestiny.setRise3(ordinary.get(r2).getValue());
+            yysDestiny.setRise1(rise.get(r1).getValue());
+            yysDestiny.setRise2(rise.get(r2).getValue());
+            yysDestiny.setRise3(rise.get(r3).getValue());
 
             //忌
-            DicyDict fallEvent = fall.get(RollUtil.iRoll(fall.size()) - 1);
-            yysDestiny.setFall1(fallEvent.getValue());
-            yysDestiny.setFall2(ordinary.get(f1).getValue());
-            yysDestiny.setFall3(ordinary.get(f2).getValue());
+            yysDestiny.setFall1(fall.get(f1).getValue());
+            yysDestiny.setFall2(fall.get(f2).getValue());
+            yysDestiny.setFall3(fall.get(f3).getValue());
 
             //游戏
             yysDestiny.setGame(iGameService.selectByid(RollUtil.iRoll(iGameService.countAll())).getGame());
