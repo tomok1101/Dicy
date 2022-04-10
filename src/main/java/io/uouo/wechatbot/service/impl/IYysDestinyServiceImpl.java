@@ -94,40 +94,39 @@ public class IYysDestinyServiceImpl implements IYysDestinyService {
             rise.addAll(ordinary);
             fall.addAll(ordinary);
 
-            int r1, r2, r3, f1, f2, f3;
+            String r1, r2, r3, f1, f2, f3;
 
-            r1 = RollUtil.iRoll(rise.size())-1;
+            r1 = rise.get(RollUtil.iRoll(rise.size())-1).getValue();
+            do {
+                r2 = rise.get(RollUtil.iRoll(rise.size())-1).getValue();
+            }while (r2.equals(r1));
 
             do {
-                r2 = RollUtil.iRoll(rise.size())-1;
-            }while (r2 == r1);
+                r3 = rise.get(RollUtil.iRoll(rise.size())-1).getValue();
+            }while (r3.equals(r1) || r3.equals(r2));
 
             do {
-                r3 = RollUtil.iRoll(rise.size())-1;
-            }while (r3 == r1 || r3 == r2);
+                f1 = rise.get(RollUtil.iRoll(fall.size())-1).getValue();
+            }while (f1.equals(r1) || f1.equals(r2) || f1.equals(r3));
 
             do {
-                f1 = RollUtil.iRoll(fall.size())-1;
-            }while (f1 == r1 || f1 == r2 || f1 == r3);
+                f2 = rise.get(RollUtil.iRoll(fall.size())-1).getValue();
+            }while (f2.equals(r1) || f2.equals(r2) || f2.equals(r3) || f2.equals(f1));
 
             do {
-                f2 = RollUtil.iRoll(fall.size())-1;
-            }while (f2 == r1 || f2 == r2 || f2 == r3 || f2 == f1);
-
-            do {
-                f3 = RollUtil.iRoll(fall.size())-1;
-            }while (f3 == r1 || f3 == r2 || f3 == r3 || f3 == f1 || f3 == f2);
+                f3 = rise.get(RollUtil.iRoll(fall.size())-1).getValue();
+            }while (f3.equals(r1) || f3.equals(r2) || f3.equals(r3) || f3.equals(f1) || f3.equals(f2));
 
 
             //宜
-            yysDestiny.setRise1(rise.get(r1).getValue());
-            yysDestiny.setRise2(rise.get(r2).getValue());
-            yysDestiny.setRise3(rise.get(r3).getValue());
+            yysDestiny.setRise1(r1);
+            yysDestiny.setRise2(r2);
+            yysDestiny.setRise3(r3);
 
             //忌
-            yysDestiny.setFall1(fall.get(f1).getValue());
-            yysDestiny.setFall2(fall.get(f2).getValue());
-            yysDestiny.setFall3(fall.get(f3).getValue());
+            yysDestiny.setFall1(f1);
+            yysDestiny.setFall2(f2);
+            yysDestiny.setFall3(f3);
 
             //游戏
             yysDestiny.setGame(iGameService.selectByid(RollUtil.iRoll(iGameService.countAll())).getGame());
