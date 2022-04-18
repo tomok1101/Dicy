@@ -243,7 +243,7 @@ public class SheSayServiceImpl implements SheSayService {
             }
 
             //.一进三连
-            else if (Pattern.compile("^\\.三连").matcher(rContent).find()) {
+            else if (Pattern.compile("^\\.欢迎").matcher(rContent).find()) {
 
                 //欢迎
                 result = "欢迎新朋友！ ヾ(≧▽≦*)o\n新群友可熟悉下本群要素：古生物科普、语言知识测验、历史研究、冰粉制作、" +
