@@ -135,4 +135,16 @@ public class WechatBotController {
         wechatBotService.getPersonalDetail(wxid);
         return AjaxResult.success();
     }
+
+    /**
+     * 描述: 获取所有群组以及成员
+     *
+     * @return io.uouo.wechatbot.common.util.AjaxResult
+     * @Author 青衫 [2940500@qq.com]
+     */
+    @GetMapping("/getMemberId}")
+    public AjaxResult getMemberId() {
+        wechatBotService.getMemberId();
+        return AjaxResult.success("执行结果稍后会打印在控制台");
+    }
 }

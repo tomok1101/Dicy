@@ -90,4 +90,12 @@ public interface WechatBotService {
      * @Date 2021-5-6
      */
     void getChatroomMemberNick(String roomid, String wxid);
+
+    /**
+     * 描述: 获取所有群组以及成员
+     *
+     * @Author 青衫 [2940500@qq.com]
+     * @Date 2021-5-6
+     */
+    void getMemberId();
 }

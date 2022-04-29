@@ -9,4 +9,6 @@ public interface SheSayService {
     //统计
     void sheCounting(WechatReceiveMsg wechatReceiveMsg);
 
+    //读取
+    void sheReading(WechatReceiveMsg wechatReceiveMsg);
 }

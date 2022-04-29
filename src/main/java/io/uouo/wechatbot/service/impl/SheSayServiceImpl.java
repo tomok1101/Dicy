@@ -1,11 +1,10 @@
 package io.uouo.wechatbot.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.alibaba.fastjson.JSONObject;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
 import io.uouo.wechatbot.entity.*;
-import io.uouo.wechatbot.mapper.YysDestinyMapper;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -452,6 +450,18 @@ public class SheSayServiceImpl implements SheSayService {
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
+
+
+            /**
+             * 测试
+             */
+
+            //  .send
+            else if (Pattern.compile("^\\.测试").matcher(rContent).find()) {
+                Matcher matcher = Pattern.compile("^\\.测试").matcher(rContent);
+                wechatBotService.getMemberId();
+            }
+
 //        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
 //            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
 //            matcher.find();
@@ -489,8 +499,13 @@ public class SheSayServiceImpl implements SheSayService {
         return;
     }
 
-
-
+    //群员统计
+    @Override
+    public void sheReading(WechatReceiveMsg wechatReceiveMsg) {
+        List<YysMemberTemp> yysMemberTemps = JSONObject.parseArray(wechatReceiveMsg.getContent(), YysMemberTemp.class);
+        yysMemberTemps.stream().filter(yysMemberTemp -> yysMemberTemp.getRoom_id().equals("18929140647@chatroom"));
+        System.out.println(yysMemberTemps);
+    }
 
 
     //DLC 吃什么.plus

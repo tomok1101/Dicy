@@ -77,13 +77,23 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 
         //收到消息
         WechatReceiveMsg wechatReceiveMsg = JSONObject.parseObject(msg, WechatReceiveMsg.class);
-        if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
+
+        //捕获群列表
+        if (WechatBotCommon.CHATROOM_MEMBER.equals(wechatReceiveMsg.getType())){
+            sheSay.sheReading(wechatReceiveMsg);
+        }
+
+        else if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
             //图灵测试
-            if (wechatReceiveMsg.getWxid().equals("24355601674@chatroom")
-                    || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")
-                    || wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) {
-                //闭群
-//                if (wechatReceiveMsg.getWxid().equals("18929140647@chatroom")) { return; }
+            if (
+                    wechatReceiveMsg.getWxid().equals("24355601674@chatroom") //图灵测试
+                            || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21") //tom
+
+//                            || wechatReceiveMsg.getWxid().equals("18929140647@chatroom") //大群
+            ) {
+
+                System.out.println("微信中收到了消息:" + msg);
+
                 sheSay.sheReplying(wechatReceiveMsg);
             }
         }
