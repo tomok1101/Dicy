@@ -124,35 +124,4 @@ public class WechatBotServiceImpl implements WechatBotService, WechatBotCommon {
         wechatMsg.setType(PERSONAL_DETAIL);
         wechatBotClient.sendMsgUtil(wechatMsg);
     }
-
-    /**
-     * 描述: 获取群组里指定联系人的详细信息
-     *
-     * @param roomid 群组id
-     * @param wxid   指定用户id
-     * @return io.uouo.wechatbot.common.util.AjaxResult
-     * @Author 青衫 [2940500@qq.com]
-     * @Date 2021-5-6
-     */
-    @Override
-    public void getChatroomMemberNick(String roomid, String wxid) {
-        WechatMsg wechatMsg = new WechatMsg();
-        wechatMsg.setRoomid(roomid);
-        wechatMsg.setWxid(roomid);
-        wechatMsg.setType(CHATROOM_MEMBER_NICK);
-        wechatBotClient.sendMsgUtil(wechatMsg);
-    }
-
-    /**
-     * 描述: 获取所有群组以及成员
-     *
-     * @Author 青衫 [2940500@qq.com]
-     * @Date 2021-5-6
-     */
-    @Override
-    public void getMemberId() {
-        WechatMsg wechatMsg = new WechatMsg();
-        wechatMsg.setType(CHATROOM_MEMBER);
-        wechatBotClient.sendMsgUtil(wechatMsg);
-    }
 }
