@@ -1,12 +1,12 @@
-package io.uouo.wechatbot.mainService.mainServiceImpl;
+package io.uouo.wechatbot.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
 import io.uouo.wechatbot.entity.*;
-import io.uouo.wechatbot.mainService.SheSayService;
-import io.uouo.wechatbot.mainService.WechatBotService;
+import io.uouo.wechatbot.service.SheSayService;
+import io.uouo.wechatbot.service.WechatBotService;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

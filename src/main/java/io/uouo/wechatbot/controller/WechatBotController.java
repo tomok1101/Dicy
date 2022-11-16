@@ -2,7 +2,7 @@ package io.uouo.wechatbot.controller;
 
 import io.uouo.wechatbot.common.util.AjaxResult;
 import io.uouo.wechatbot.domain.WechatMsg;
-import io.uouo.wechatbot.mainService.WechatBotService;
+import io.uouo.wechatbot.service.WechatBotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

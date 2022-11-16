@@ -1,4 +1,4 @@
-package io.uouo.wechatbot.mainService;
+package io.uouo.wechatbot.service;
 
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
 
