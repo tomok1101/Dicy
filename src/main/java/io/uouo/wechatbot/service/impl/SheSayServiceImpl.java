@@ -1,12 +1,11 @@
 package io.uouo.wechatbot.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import io.uouo.wechatbot.client.WechatBotClient;
 import io.uouo.wechatbot.common.util.RollUtil;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
 import io.uouo.wechatbot.entity.*;
-import io.uouo.wechatbot.service.SheSayService;
-import io.uouo.wechatbot.service.WechatBotService;
 import io.uouo.wechatbot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.uouo.wechatbot.common.WechatBotCommon.*;
+
 @Service
 @Transactional
 public class SheSayServiceImpl implements SheSayService {
@@ -28,16 +29,7 @@ public class SheSayServiceImpl implements SheSayService {
     private WechatBotService wechatBotService;
 
     @Autowired
-    private IEventService iEventService;
-
-    @Autowired
-    private IGameService iGameService;
-
-    @Autowired
     private IFoodService iFoodService;
-
-    @Autowired
-    private IMerryChristmasService iMerryChristmasService;
 
     @Autowired
     private IYysDearfriendService iYysDearfriendService;
@@ -57,133 +49,62 @@ public class SheSayServiceImpl implements SheSayService {
     @Autowired
     private IYysDestinyService iYysDestinyService;
 
+    @Autowired
+    private WechatBotClient wechatBotClient;
+
+
     @Override
     public void sheReplying(WechatReceiveMsg wechatReceiveMsg) {
         this.sheCounting(wechatReceiveMsg);
 
-        String rContent = wechatReceiveMsg.getContent();//收到消息串
+        String order = wechatReceiveMsg.getContent();//收到消息串
         WechatMsg replyMsg = new WechatMsg();//回复消息实体
         replyMsg.setWxid(wechatReceiveMsg.getWxid());//回复到群
 
-        //文字回复
-        if (Pattern.compile("^\\.").matcher(rContent).find()) {
 
+        //汤回复
+        if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
+            String result = wechatReceiveMsg.getContent();
+            replyMsg.setWxid("18929140647@chatroom");
+            replyMsg.setContent(result);
+            wechatBotService.sendTextMsg(replyMsg);
+        }
+
+        //1 文字回复-处理.开头指令
+        else if (Pattern.compile("^\\.").matcher(order).find()) {
             String result = "";//回复信息串
 
-            // .help
-            if (Pattern.compile("^\\.help$").matcher(rContent).find()) {
-                result = "| 骰娘正义使用只能指南，不许指北(⓿_⓿)\n";
-                result += "| 1 .1d6 事件           | 普通骰\n";
-                result += "| 2 .rc 事件 成功率     | 事件骰\n";
-                result += "| 3 .r 事件             | 事件100点骰\n";
-                result += "| 4 .吃什么             | 吃骰\n";
-                result += "| 5 .抽签               | 签骰\n";
-                result += "| 6 .login 用户名       | 不主动你跟骰娘就没有故事\n";
-                result += "| 7 .摸                 | 摸了\n";
-                result += "| 8 .expellifish + 目标 | 除你fish！\n";
-                result += "| 8 .日摸量             | 不会大家都在工作吧？不会吧\n";
-                result += "| 9 .draw               | 你的回合，抽卡！\n";
-                result += "| 10 .draw 圣三角牌阵    | 抽三张塔罗牌放置在圣三角牌阵\n";
-                result += "| 11 .欢迎 #本群要素 .政审 | 一进三连！\n";
-                result += "| 0 .send+意见          | 欢迎正经意见和想要的功能！\n";
-                result += "| 谢谢你跟骰娘聊天，希望你休息一下摸鱼开心( •̀ ω •́ )✧\n";
-                replyMsg.setContent(result);
+            // 1-1 .help
+            if (Pattern.compile("^\\.help$").matcher(order).find()) {
+                replyMsg.setContent(help(result));
                 wechatBotService.sendTextMsg(replyMsg);
             }
+
 
             /**
              * 骰点
              */
-
-            // .d 掷骰
-            else if (Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(rContent).find()) {
-                //检测
-                Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(rContent);
-                matcher.find();
-                //捕获
-                Integer times = Integer.valueOf(matcher.group(1));
-                Integer points = Integer.valueOf(matcher.group(2));
-                //执行
-                if ((times > 99) || (points > 9999) || times <= 0 || points <= 0) {
-                    result = "不许乱骰！";
-                } else {
-                    result = "点数-> ";
-                    for (int i = 0; i < times; i++) {
-                        if (i != times - 1) {
-                            result = result + RollUtil.iRoll(times) + ", ";
-                        } else {
-                            result = result + RollUtil.iRoll(points);
-                        }
-                    }
-                }
-                replyMsg.setContent(result);
+            // 1-2 .d
+            else if (Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(order).find()) {
+                replyMsg.setContent(d(result, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .d 事件 掷骰
-            else if (Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]*)").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
-                matcher.find();
-                Integer times = Integer.valueOf(matcher.group(1));
-                Integer points = Integer.valueOf(matcher.group(2));
-                String event = matcher.group(3);
-                if ((times.intValue() > 99) || (points.intValue() > 9999) || times <= 0 || points <= 0) {
-                    result = "不许乱骰！";
-                } else {
-                    result = event + "投掷点数 -> ";
-                    for (int i = 0; i < times.intValue(); i++) {
-                        if (i != times.intValue() - 1) {
-                            result = result + (int) (Math.random() * points.intValue() + 1.0D) + ", ";
-                        } else {
-                            result = result + (int) (Math.random() * points.intValue() + 1.0D);
-                        }
-                    }
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]*)").matcher(order).find()) {
+                replyMsg.setContent(dEvent(result, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .rc 事件判定
-            else if (Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+$)").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(rContent);
-                matcher.find();
-                String event = matcher.group(1);
-                Integer point = Integer.valueOf(matcher.group(2));
-                String diceResult = "";
-                int rate = RollUtil.hundredRoll();
-
-                if (100 > point) {
-                    if (rate >= point) {
-                        diceResult = rate >= 95 ? "大失败" : "失败";
-                    } else if (rate == point) {
-                        diceResult = "勉强成功";
-                    } else if (rate < point) {
-                        if (rate < point / 5) {
-                            diceResult = rate <= 5 ? "大！成！功！" : "极难成功";
-                        } else if (rate < point / 2) {
-                            diceResult = "困难成功";
-                        } else {
-                            diceResult = "成功";
-                        }
-                    }
-                    result = "进行" + event + "判定:\n";
-                    result = result + "D100 = " + rate + "/" + point + " " + diceResult;
-                } else {
-                    return;
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d+$)").matcher(order).find()) {
+                replyMsg.setContent(rcEvent(result, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .r
-            else if (Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+$)").matcher(rContent);
-                matcher.find();
-                String events = matcher.group(1);
-                YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-                String name = dearfriend == null ? "那个谁" : dearfriend.getNickname();
-                result = name + "进行" + events + "投掷，点数为：" + RollUtil.hundredRoll();
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(order).find()) {
+                replyMsg.setContent(rEvent(result, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
@@ -191,66 +112,29 @@ public class SheSayServiceImpl implements SheSayService {
             /**
              * 日常
              */
-            // .吃
-            else if (Pattern.compile("^\\.吃什么|^\\.吃撒子|^\\.恰啥").matcher(rContent).find()) {
-                if (RollUtil.iRoll(10) > 5) {
-                    result = foodList.get(RollUtil.iRoll(foodList.size() - 1));
-                } else {
-                    result = "骰娘推荐恰：" + iFoodService.selectByid(RollUtil.iRoll(iFoodService.countAll())).getFood();
-                }
-                replyMsg.setContent(result);
+            // .吃什么
+            else if (Pattern.compile("^\\.吃什么|^\\.吃撒子|^\\.恰啥").matcher(order).find()) {
+                replyMsg.setContent(what2eat(result));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             //  .抽签
-            else if (Pattern.compile("^\\.抽签").matcher(rContent).find()) {
-                YysDestiny destiny = iYysDestinyService.destiny(wechatReceiveMsg.getId1());
-                if (destiny == null) {
-                    result = "请先签订契约，格式.login 名字";
-                } else {
-                    result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
-                            destiny.getNickname() + "摸の運 • 【" + destiny.getDestiny() + "】\n" +
-                            "\uD83E\uDD70宜：" + destiny.getRise1() + "、" + destiny.getRise2() + "、" + destiny.getRise3() + "\n" +
-                            "☠忌：" + destiny.getFall1() + "、" + destiny.getFall2() + "、" + destiny.getFall3() + "\n" +
-                            "今日有缘游戏：《" + destiny.getGame()  + "》来，试试看吧！";
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.抽签").matcher(order).find()) {
+                replyMsg.setContent(ballot(result, wechatReceiveMsg));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             //.draw
-            else if (Pattern.compile("^\\.draw$").matcher(rContent).find()) {
-                DicyDict tarot = iDicyDictService.rollByDict("tarot");
-                YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-                String name = dearfriend == null ? "那个谁" : dearfriend.getNickname();
-                String replace = tarot.getValue().replace(":", ":\n");
-                result = name + "抽到了:\n" + replace;
-                replyMsg.setContent(result);
-                wechatBotService.sendTextMsg(replyMsg);
-            }
-
-            //.draw 圣三角牌阵
-            else if (Pattern.compile("^\\.draw\\s*圣三角牌阵$").matcher(rContent).find()) {
-                List<DicyDict> tarot = iDicyDictService.holyTriangle();
-                YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-                String name = dearfriend == null ? "那个谁" : dearfriend.getNickname();
-                result = name + "抽到了:\n";
-                result += "过去的经验：" + tarot.get(0).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位") + "\n";
-                result += "问题的现状：" + tarot.get(1).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位") + "\n";
-                result += "将来的预测：" + tarot.get(2).getTitle() + (RollUtil.iRoll(2) == 1 ? "正位" : "逆位");
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.draw$").matcher(order).find()) {
+                replyMsg.setContent(draw(result, wechatReceiveMsg));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             //.一进三连
-            else if (Pattern.compile("^\\.欢迎").matcher(rContent).find()) {
+            else if (Pattern.compile("^\\.欢迎").matcher(order).find()) {
 
                 //欢迎
-                result = "欢迎新朋友！ ヾ(≧▽≦*)o\n新群友可熟悉下本群要素：古生物科普、语言知识测验、历史研究、冰粉制作、" +
-                        "摸鱼划水、考公考学、化学实验、诗歌鉴赏、色图沙雕图、时政要闻、设计交流、" +
-                        "会计报账、课外辅导、打嗝教学、提桶跑路、淘宝好物分享、猪话教学、吸蚂蚁屁股、" +
-                        "美妆教学、护肤品分享、青春疼痛文学、都市故事分享、照片鉴赏、社会工程学、健身互助、" +
-                        "女装教程、看看、啵啵、地铁坐反，旅游观星、羽毛球教学、房地产投资、家装推荐、单车骑行。";
+                result = "欢迎新朋友！ ヾ(≧▽≦*)o\n新群友可熟悉下本群要素！";
                 replyMsg.setContent(result);
                 wechatBotService.sendTextMsg(replyMsg);
 
@@ -265,168 +149,46 @@ public class SheSayServiceImpl implements SheSayService {
                 wechatBotService.sendTextMsg(replyMsg);
 
                 //本群要素
-                replyMsg.setContent("C:\\workplace\\code\\Img\\hello\\bqys.jpg");
+                replyMsg.setContent("static/hello/bqys.jpg");
                 wechatBotService.sendImgMsg(replyMsg);
             }
-
 
 
             /**
              * 活动
              */
 
-            //  .圣诞快乐
-            else if (Pattern.compile("^\\.mc.|圣诞快乐").matcher(rContent).find()) {
-                if (Pattern.compile("^\\.mc.reset").matcher(rContent).find()) {
-                    iMerryChristmasService.reset();
-                } else if (Pattern.compile("^\\.del\\s*([\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-                    Matcher matcher = Pattern.compile("^\\.del\\s*([\\u4e00-\\u9fa5]+)").matcher(rContent);
-                    matcher.find();
-                    String del = matcher.group(1);
-                    iMerryChristmasService.del(del);
-                } else if (Pattern.compile("^\\.add\\s*([\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-                    Matcher matcher = Pattern.compile("^\\.add\\s*([\\u4e00-\\u9fa5]+)").matcher(rContent);
-                    matcher.find();
-                    String add = matcher.group(1);
-                    iMerryChristmasService.add(add);
-                } else if (Pattern.compile("圣诞快乐").matcher(rContent).find()) {
-                    String gift = iMerryChristmasService.get(wechatReceiveMsg.getId1());
-                    result = gift + "的圣诞礼物请收下~";
-                } else {
-                    return;
-                }
-                replyMsg.setContent(result);
-                wechatBotService.sendTextMsg(replyMsg);
-            }
-
 
             /**
              * 摸鱼系统
              */
-
             // .login  你的名字
-            else if (Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
-                matcher.find();
-                String nickname = matcher.group(1);
-                YysDearfriend dearfriend = new YysDearfriend();
-                dearfriend.setWxid(wechatReceiveMsg.getId1());
-                dearfriend.setNickname(nickname);
-                boolean add = iYysDearfriendService.add(dearfriend);
-                if (add) {
-                    result = "ヾ(•ω•`)o HI";
-                } else {
-                    result = "( ⓛ ω ⓛ *)想改吗？但 是 我 拒 绝";
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(order).find()) {
+                replyMsg.setContent(login(result, wechatReceiveMsg, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .摸lv
-            else if (Pattern.compile("^\\.摸$").matcher(rContent).find()) {
-
-                YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
-                if (fish == null) {
-                    result = "请先签订契约，格式.login 名字";
-                } else {
-                    Integer lv = fish.getFishLv() + fish.getBonusLv();
-                    Integer expellifish = fish.getExpellifish();
-                    Integer avadabanana = fish.getAvadabanana();
-
-                    if (lv < 0) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n社会主义的终极敌人......资本の狂热信徒，摸出成就“邪恶资本家”";
-                    } else if (lv <= 5) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n就这，你管这叫摸鱼？老板赚疯了！";
-                    } else if (lv < 15) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！";
-                    } else if (lv < 30) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您战战兢兢，摸出成就“逐渐步入正轨啦”";
-                    } else if (lv < 50) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您小有心得，摸出成就“摸鱼新手-十里坡剑圣”";
-                    } else if (lv < 75) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”";
-                    } else if (lv < 105) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”";
-                    } else if (lv < 140) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”";
-                    } else if (lv < 180) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您就是高，摸出成就“摸鱼高级-摸鱼达人”";
-                    } else if (lv < 225) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”";
-                    } else if (lv < 270) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”";
-                    } else if (lv < 325) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”";
-                    } else if (lv < 380) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”";
-                    } else if (lv < 445) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”";
-                    } else if (lv < 515) {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”";
-                    } else {
-                        result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”";
-                    }
-                    result += "\n🧙‍♂️>【" + expellifish + "】";
-                    if (avadabanana != 0){
-                        result += " \n😇 >【" + avadabanana + "】";
-                    }
-
-
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.摸$").matcher(order).find()) {
+                replyMsg.setContent(touch(result, wechatReceiveMsg));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .expellifish
-            else if (Pattern.compile("^\\.expellifish\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.expellifish\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
-                matcher.find();
-                String nickname = matcher.group(1);
-                SpellEvent event = iSpellEventService.getExpellifishEvent();
-                Map<String, Object> expellifish = iYysFishDailyService.spellcasting(wechatReceiveMsg.getId1(), nickname, event, "expellifish");
-                if ("miss".equals(expellifish.get("status"))) {
-                    //瞄错了
-                    result = "请瞄准再打...";
-                } else if ("null".equals(expellifish.get("status"))) {
-                    result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
-                } else if ("luckyShot".equals(expellifish.get("status"))) {
-                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage"))) + "\n[AVADA]";
-                } else {
-                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.expellifish\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(order).find()) {
+                replyMsg.setContent(expellifish(result, wechatReceiveMsg, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             // .avadabanana
-            else if (Pattern.compile("^\\.avadabanana\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.avadabanana\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(rContent);
-                matcher.find();
-                String nickname = matcher.group(1);
-                SpellEvent event = iSpellEventService.getAvadaBananaEvent();
-                Map<String, Object> AvadaABaBa = iYysFishDailyService.spellcasting(wechatReceiveMsg.getId1(), nickname, event, "avadabanana");
-                if ("miss".equals(AvadaABaBa.get("status"))) {
-                    //瞄错了
-                    result = "请瞄准再打...";
-                } else if ("null".equals(AvadaABaBa.get("status"))) {
-                    result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
-                } else {
-                    result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) AvadaABaBa.get("damage")));
-                }
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.avadabanana\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(order).find()) {
+                replyMsg.setContent(avadabanana(result, wechatReceiveMsg, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
             //  .日摸量
-            else if (Pattern.compile("^\\.日摸量").matcher(rContent).find()) {
-                Map<String, Object> param = iYysFishDailyService.touchToday();
-                Integer tt = (Integer) param.get("TT");
-                String tk = (String) param.get("TK");
-                String ti = (String) param.get("TI");
-                Integer tm = (Integer) param.get("TM");
-
-                result = "今天的摸鱼总量：" + tt + " |\n 摸鱼人数：" + tm + " |\n 摸鱼king是......" + tk + "！！！\n插播一条紧急消息！！" + ti + "被创进了ICU...聊天千万条，安全第一条！！两行泪啊两行泪！！";
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.日摸量").matcher(order).find()) {
+                replyMsg.setContent(dailyTouch(result));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
@@ -436,59 +198,22 @@ public class SheSayServiceImpl implements SheSayService {
              */
 
             //  .send
-            else if (Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.?!，。？！、\\s\\u4e00-\\u9fa5]+)").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(rContent);
-                matcher.find();
-                String s = matcher.group(1);
-                YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
-                String name = dearfriend == null ? wechatReceiveMsg.getId1() : dearfriend.getNickname();
-                Suggestion suggestion = new Suggestion();
-                suggestion.setWxid(wechatReceiveMsg.getId1());
-                suggestion.setNickname(name);
-                suggestion.setSuggestion(s);
-                iSuggestionService.send(suggestion);
-                result = "意见收到！使命必达！下次一定！改！";
-                replyMsg.setContent(result);
+            else if (Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.?!，。？！、\\s\\u4e00-\\u9fa5]+)").matcher(order).find()) {
+                replyMsg.setContent(send(result, wechatReceiveMsg, order));
                 wechatBotService.sendTextMsg(replyMsg);
             }
 
 
 
-            /**
-             * 测试
-             */
-
-            //  .send
-            else if (Pattern.compile("^\\.测试").matcher(rContent).find()) {
-                Matcher matcher = Pattern.compile("^\\.测试").matcher(rContent);
-                wechatBotService.getMemberId();
-            }
-
-//        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(rContent).find()) {
-//            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(rContent);
+//        else if (Pattern.compile("^\\.\\s*(\\d+)\\s*d\\s*(\\d+)").matcher(order).find()) {
+//            Matcher matcher = Pattern.compile("(\\D*)(\\d+)(.*)").matcher(order);
 //            matcher.find();
 //            String s = matcher.group(1);
 //
 //        }
-
-            else {
-                return;
-            }
-
         }
-
         //图片回复
-        else if (Pattern.compile("^#").matcher(rContent).find()) {
-
-
-        }
-
-        //汤回复
-        else if (wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21")) {
-            String result = wechatReceiveMsg.getContent();
-            replyMsg.setWxid("18929140647@chatroom");
-            replyMsg.setContent(result);
-            wechatBotService.sendTextMsg(replyMsg);
+        else if (Pattern.compile("^#").matcher(order).find()) {
         }
 
     }
@@ -507,6 +232,322 @@ public class SheSayServiceImpl implements SheSayService {
         List<YysMemberTemp> yysMemberTemps = JSONObject.parseArray(wechatReceiveMsg.getContent(), YysMemberTemp.class);
         yysMemberTemps.stream().filter(yysMemberTemp -> yysMemberTemp.getRoom_id().equals("18929140647@chatroom"));
         System.out.println(yysMemberTemps);
+    }
+
+    //测试
+    @Override
+    public void sheTesting(WechatReceiveMsg wechatReceiveMsg) {
+        String order = wechatReceiveMsg.getContent();//收到消息串
+        WechatMsg replyMsg = new WechatMsg();//回复消息实体
+
+        //请求通讯录列表
+        if (Pattern.compile("^\\.测试1").matcher(order).find()) {
+            replyMsg.setType(USER_LIST);
+            replyMsg.setContent("user list");
+            replyMsg.setWxid("root");
+            wechatBotClient.sendMsgUtil(replyMsg);
+        }
+
+        //获取所有群及群成员列表
+        else if (Pattern.compile("^\\.测试2").matcher(order).find()) {
+            replyMsg.setType(CHATROOM_MEMBER);
+            replyMsg.setContent("op:list member");
+            replyMsg.setWxid("null");
+            wechatBotClient.sendMsgUtil(replyMsg);
+        }
+
+        //获取所有群及群成员列表
+        else if (Pattern.compile("^\\.测试3").matcher(order).find()) {
+            wechatBotService.getChatroomMemberNick("24355601674@chatroom", "wxid_k8dmqrjjjs8422");
+            wechatBotClient.sendMsgUtil(replyMsg);
+        }
+
+        //获取所有群及群成员列表
+        else if (Pattern.compile("^\\.测试4").matcher(order).find()) {
+            replyMsg.setType(PERSONAL_DETAIL);
+            replyMsg.setContent("op:personal detail");
+            replyMsg.setWxid("wxid_k8dmqrjjjs8422");
+            wechatBotClient.sendMsgUtil(replyMsg);
+        }
+
+    }
+
+
+    /**
+     * 行为抽象
+     */
+
+    //.help
+    private String help(String result) {
+        result = "| 骰娘正义使用只能指南，不许指北(⓿_⓿)\n";
+        result += "| 1 .1d6 事件           | 普通骰\n";
+        result += "| 2 .rc 事件 成功率     | 事件骰\n";
+        result += "| 3 .r 事件             | 事件100点骰\n";
+        result += "| 4 .吃什么             | 吃骰\n";
+        result += "| 5 .抽签               | 签骰\n";
+        result += "| 6 .login 用户名       | 不主动你跟骰娘就没有故事\n";
+        result += "| 7 .摸                 | 摸了\n";
+        result += "| 8 .expellifish + 目标 | 除你fish！\n";
+        result += "| 8 .日摸量             | 不会大家都在工作吧？不会吧\n";
+        result += "| 9 .draw               | 你的回合，抽卡！\n";
+        result += "| 10 .欢迎             | 一进三连！\n";
+        result += "| 0 .send+意见          | 欢迎正经意见和想要的功能！\n";
+        result += "| 谢谢你跟骰娘聊天，希望你休息一下摸鱼开心( •̀ ω •́ )✧\n";
+        return result;
+    }
+
+    //.d
+    private String d(String result, String order) {
+        //检测
+        Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)$").matcher(order);
+        matcher.find();
+        //捕获
+        Integer times = Integer.valueOf(matcher.group(1));
+        Integer points = Integer.valueOf(matcher.group(2));
+        //执行
+        if ((times > 99) || (points > 9999) || times <= 0 || points <= 0) {
+            result = "不许乱骰！";
+        } else {
+            result = "点数-> ";
+            for (int i = 0; i < times; i++) {
+                if (i != times - 1) {
+                    result = result + RollUtil.iRoll(times) + ", ";
+                } else {
+                    result = result + RollUtil.iRoll(points);
+                }
+            }
+        }
+        return result;
+    }
+
+    //.d 事件
+    private String dEvent(String result, String order) {
+        Matcher matcher = Pattern.compile("^\\.(\\d+)d(\\d+)\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(order);
+        matcher.find();
+        Integer times = Integer.valueOf(matcher.group(1));
+        Integer points = Integer.valueOf(matcher.group(2));
+        String event = matcher.group(3);
+        if ((times.intValue() > 99) || (points.intValue() > 9999) || times <= 0 || points <= 0) {
+            result = "不许乱骰！";
+        } else {
+            result = event + "投掷点数 -> ";
+            for (int i = 0; i < times.intValue(); i++) {
+                if (i != times.intValue() - 1) {
+                    result = result + (int) (Math.random() * points.intValue() + 1.0D) + ", ";
+                } else {
+                    result = result + (int) (Math.random() * points.intValue() + 1.0D);
+                }
+            }
+        }
+        return result;
+    }
+
+    //.rc 事件 成功率
+    private String rcEvent(String result, String order) {
+        Matcher matcher = Pattern.compile("^\\.rc\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)\\s*(\\d{2}$)").matcher(order);
+        matcher.find();
+        String event = matcher.group(1);
+        Integer point = Integer.valueOf(matcher.group(2));
+        String diceResult = "";
+        int rate = RollUtil.hundredRoll();
+
+        if (100 > point) {
+            if (rate >= point) {
+                diceResult = rate >= 95 ? "大失败" : "失败";
+            } else if (rate == point) {
+                diceResult = "勉强成功";
+            } else if (rate < point) {
+                if (rate < point / 5) {
+                    diceResult = rate <= 5 ? "大！成！功！" : "极难成功";
+                } else if (rate < point / 2) {
+                    diceResult = "困难成功";
+                } else {
+                    diceResult = "成功";
+                }
+            }
+            result = "进行" + event + "判定:\n";
+            result = result + "D100 = " + rate + "/" + point + " " + diceResult;
+        } else {
+            return "指令有误";
+        }
+        return result;
+    }
+
+    //.r 事件
+    private String rEvent(String result, String order) {
+        Matcher matcher = Pattern.compile("^\\.r\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+$)").matcher(order);
+        matcher.find();
+        String events = matcher.group(1);
+        result = events + "骰点，点数：" + RollUtil.hundredRoll();
+        return result;
+    }
+
+
+    //.吃什么
+    private String what2eat(String result) {
+        if (RollUtil.iRoll(10) > 5) {
+            result = foodList.get(RollUtil.iRoll(foodList.size() - 1));
+        } else {
+            result = "骰娘推荐恰：" + iFoodService.selectByid(RollUtil.iRoll(iFoodService.countAll())).getFood();
+        }
+        return result;
+    }
+
+    //.抽签
+    private String ballot(String result, WechatReceiveMsg wechatReceiveMsg) {
+        YysDestiny destiny = iYysDestinyService.destiny(wechatReceiveMsg.getId1());
+        if (destiny == null) {
+            result = "请先签订契约，格式.login 名字";
+        } else {
+            result = new SimpleDateFormat("yyyy年MM月dd日").format(new Date()) + "\n" +
+                    destiny.getNickname() + "摸の運 • 【" + destiny.getDestiny() + "】\n" +
+                    "\uD83E\uDD70宜：" + destiny.getRise1() + "、" + destiny.getRise2() + "、" + destiny.getRise3() + "\n" +
+                    "☠忌：" + destiny.getFall1() + "、" + destiny.getFall2() + "、" + destiny.getFall3() + "\n" +
+                    "今日有缘游戏：《" + destiny.getGame() + "》来，试试看吧！";
+        }
+        return result;
+    }
+
+    //.draw
+    private String draw(String result, WechatReceiveMsg wechatReceiveMsg) {
+        DicyDict tarot = iDicyDictService.rollByDict("tarot");
+        YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
+        String name = dearfriend == null ? "那个谁" : dearfriend.getNickname();
+        String replace = tarot.getValue().replace(":", ":\n");
+        result = name + "抽到了:\n" + replace;
+        return result;
+    }
+
+    //.login
+    private String login(String result, WechatReceiveMsg wechatReceiveMsg, String order) {
+        Matcher matcher = Pattern.compile("^\\.login\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(order);
+        matcher.find();
+        String nickname = matcher.group(1);
+        YysDearfriend dearfriend = new YysDearfriend();
+        dearfriend.setWxid(wechatReceiveMsg.getId1());
+        dearfriend.setNickname(nickname);
+        boolean add = iYysDearfriendService.add(dearfriend);
+        if (add) {
+            result = "ヾ(•ω•`)o HI";
+        } else {
+            result = "( ⓛ ω ⓛ *)想改吗？但 是 我 拒 绝";
+        }
+        return result;
+    }
+
+    //.摸
+    private String touch(String result, WechatReceiveMsg wechatReceiveMsg) {
+        YysFishDaily fish = iYysFishDailyService.touchLv(wechatReceiveMsg.getId1());
+        if (fish == null) {
+            result = "请先签订契约，格式如下：\n.login 名字";
+        } else {
+            Integer lv = fish.getFishLv() + fish.getBonusLv();
+            Integer expellifish = fish.getExpellifish();
+            Integer avadabanana = fish.getAvadabanana();
+            if (lv < 0) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n社会主义的终极敌人......资本の狂热信徒，摸出成就“邪恶资本家”";
+            } else if (lv <= 5) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n就这，你管这叫摸鱼？老板赚疯了！";
+            } else if (lv < 15) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n一般般吧，但距离真正的摸鱼还有差距，加油，摸死资本主义！";
+            } else if (lv < 30) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您战战兢兢，摸出成就“逐渐步入正轨啦”";
+            } else if (lv < 50) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您小有心得，摸出成就“摸鱼新手-十里坡剑圣”";
+            } else if (lv < 75) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您开始掌握技巧，摸出成就“摸鱼入门-一起打开新世界大门”";
+            } else if (lv < 105) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您不忘党心，摸出成就“摸鱼初级-无产阶级朝你挥手”";
+            } else if (lv < 140) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您痛恨资本主义，摸出成就“摸鱼中级-薅资本主义羊毛还是你会”";
+            } else if (lv < 180) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您就是高，摸出成就“摸鱼高级-摸鱼达人”";
+            } else if (lv < 225) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您就算闭着眼叼着五根烟卷入嘴里也能摸，摸出成就“摸鱼带师-娴熟的摸鱼技巧习得者”";
+            } else if (lv < 270) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您眼里的准心对准老板，摸出成就“摸鱼强者-老板心腹大患”";
+            } else if (lv < 325) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您不上班吗，摸出成就“摸鱼王者-你不上班的吗？”";
+            } else if (lv < 380) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n这您都不是摸鱼king吗，摸出成就“摸鱼王中王-谨记本群宗旨”";
+            } else if (lv < 445) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您摸出火光了，摸出成就“摸鱼之光-将摸鱼精神贯彻到底”";
+            } else if (lv < 515) {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n您摸起一阵龙卷风，摸出成就“摸鱼卷王-摸鱼也能卷起来”";
+            } else {
+                result = "检测到" + fish.getNickname() + "摸鱼级别为Lv_" + lv + "\n究极の生物，神的手，您所摸之处，资本腐朽，人民安康，摸出成就“咸鱼王幼年体”";
+            }
+            result += "\n🧙‍♂️>【" + expellifish + "】";
+            if (avadabanana != 0) {
+                result += " \n😇 >【" + avadabanana + "】";
+            }
+        }
+        return result;
+    }
+
+    //.expellifish
+    private String expellifish(String result, WechatReceiveMsg wechatReceiveMsg, String order) {
+        Matcher matcher = Pattern.compile("^\\.expellifish\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(order);
+        matcher.find();
+        String nickname = matcher.group(1);
+        SpellEvent event = iSpellEventService.getExpellifishEvent();
+        Map<String, Object> expellifish = iYysFishDailyService.spellcasting(wechatReceiveMsg.getId1(), nickname, event, "expellifish");
+        if ("miss".equals(expellifish.get("status"))) {
+            //瞄错了
+            result = "请瞄准再打...";
+        } else if ("null".equals(expellifish.get("status"))) {
+            result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
+        } else if ("luckyShot".equals(expellifish.get("status"))) {
+            result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage"))) + "\n[AVADA]";
+        } else {
+            result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) expellifish.get("damage")));
+        }
+        return result;
+    }
+
+    //.avadabanana
+    private String avadabanana(String result, WechatReceiveMsg wechatReceiveMsg, String order) {
+        Matcher matcher = Pattern.compile("^\\.avadabanana\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)$").matcher(order);
+        matcher.find();
+        String nickname = matcher.group(1);
+        SpellEvent event = iSpellEventService.getAvadaBananaEvent();
+        Map<String, Object> AvadaABaBa = iYysFishDailyService.spellcasting(wechatReceiveMsg.getId1(), nickname, event, "avadabanana");
+        if ("miss".equals(AvadaABaBa.get("status"))) {
+            //瞄错了
+            result = "请瞄准再打...";
+        } else if ("null".equals(AvadaABaBa.get("status"))) {
+            result = "我赌你的魔杖没有子弹ψ(｀∇´)ψ";
+        } else {
+            result = String.format(event.getFishEvent(), nickname, Math.abs((Integer) AvadaABaBa.get("damage")));
+        }
+        return result;
+    }
+
+    //.日摸量
+    private String dailyTouch(String result) {
+        Map<String, Object> param = iYysFishDailyService.touchToday();
+        Integer tt = (Integer) param.get("TT");
+        String tk = (String) param.get("TK");
+        String ti = (String) param.get("TI");
+        Integer tm = (Integer) param.get("TM");
+        result = "今天的摸鱼总量：" + tt + " |\n 摸鱼人数：" + tm + " |\n 摸鱼king是......" + tk + "！！！\n插播一条紧急消息！！" + ti + "被创进了ICU...聊天千万条，安全第一条！！两行泪啊两行泪！！";
+        return result;
+    }
+
+    //.send
+    private String send(String result, WechatReceiveMsg wechatReceiveMsg, String order) {
+        Matcher matcher = Pattern.compile("^\\.send\\s*([a-zA-Z0-9,.?!，。？！、\\u4e00-\\u9fa5]+)").matcher(order);
+        matcher.find();
+        String s = matcher.group(1);
+        YysDearfriend dearfriend = iYysDearfriendService.check(wechatReceiveMsg.getId1());
+        String name = dearfriend == null ? wechatReceiveMsg.getId1() : dearfriend.getNickname();
+        Suggestion suggestion = new Suggestion();
+        suggestion.setWxid(wechatReceiveMsg.getId1());
+        suggestion.setNickname(name);
+        suggestion.setSuggestion(s);
+        iSuggestionService.send(suggestion);
+        result = "意见收到！使命必达！下次一定！改！";
+        return result;
     }
 
 

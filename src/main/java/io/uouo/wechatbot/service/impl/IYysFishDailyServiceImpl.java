@@ -70,7 +70,7 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                 List<YysFishDaily> myFish = yesterdayFishs.stream().filter(fish -> fish.getWxid().equals(wxid)).collect(Collectors.toList());
                 yesterdayFishs.forEach(e -> e.setLv(e.getFishLv() + e.getBonusLv()));
                 String fishKing = yesterdayFishs.stream().max(Comparator.comparing(YysFishDaily::getLv)).get().getWxid();
-                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getLv)).get().getWxid();
+//                String fishBones = yesterdayFishs.stream().min(Comparator.comparing(YysFishDaily::getLv)).get().getWxid();
 
                 //昨日摸鱼量
                 if (myFish.size() == 0) {
@@ -101,10 +101,10 @@ public class IYysFishDailyServiceImpl implements IYysFishDailyService {
                     yysFishDaily.setAvadabanana(yysFishDaily.getAvadabanana() + yesterdayFish.getAvadabanana());
 
                     //清空icu患者数据
-                    if (yesterdayFish.getWxid().equals(fishBones)) {
-                        yysFishDaily.setExpellifish(0);
-                        yysFishDaily.setAvadabanana(0);
-                    }
+//                    if (yesterdayFish.getWxid().equals(fishBones)) {
+//                        yysFishDaily.setExpellifish(0);
+//                        yysFishDaily.setAvadabanana(0);
+//                    }
                 }
 
             } else {

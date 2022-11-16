@@ -11,4 +11,7 @@ public interface SheSayService {
 
     //读取
     void sheReading(WechatReceiveMsg wechatReceiveMsg);
+
+    //测试
+    void sheTesting(WechatReceiveMsg wechatReceiveMsg);
 }
