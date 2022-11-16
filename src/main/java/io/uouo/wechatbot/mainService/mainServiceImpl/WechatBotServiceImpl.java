@@ -1,9 +1,10 @@
-package io.uouo.wechatbot.service.impl;
+package io.uouo.wechatbot.mainService.mainServiceImpl;
 
 import io.uouo.wechatbot.client.WechatBotClient;
 import io.uouo.wechatbot.common.WechatBotCommon;
 import io.uouo.wechatbot.domain.WechatMsg;
-import io.uouo.wechatbot.service.WechatBotService;
+
+import io.uouo.wechatbot.mainService.WechatBotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

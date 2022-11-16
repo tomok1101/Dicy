@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.uouo.wechatbot.common.WechatBotCommon;
 import io.uouo.wechatbot.domain.WechatMsg;
 import io.uouo.wechatbot.domain.WechatReceiveMsg;
+import io.uouo.wechatbot.mainService.SheSayService;
 import io.uouo.wechatbot.service.*;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
