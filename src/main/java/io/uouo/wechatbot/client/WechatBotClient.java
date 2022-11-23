@@ -7,11 +7,14 @@ import io.uouo.wechatbot.domain.WechatReceiveMsg;
 import io.uouo.wechatbot.service.SheSayService;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 
 /**
  * websocket机器人客户端
@@ -21,7 +24,7 @@ import java.net.URISyntaxException;
  * @Description: < 描述 >
  */
 public class WechatBotClient extends WebSocketClient implements WechatBotCommon {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(WechatBotClient.class);
     @Autowired
     private SheSayService sheSay;
 
@@ -75,27 +78,42 @@ public class WechatBotClient extends WebSocketClient implements WechatBotCommon 
 //        }
 //        System.out.println("微信中收到了消息:" + msg);
 
-        //收到消息
+
+//        //捕获群列表
+//        if (WechatBotCommon.CHATROOM_MEMBER.equals(wechatReceiveMsg.getType())){
+//            sheSay.sheReading(wechatReceiveMsg);
+//        }
+
+        //收到消息 去除心跳信息
         WechatReceiveMsg wechatReceiveMsg = JSONObject.parseObject(msg, WechatReceiveMsg.class);
+        if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
 
-        //捕获群列表
-        if (WechatBotCommon.CHATROOM_MEMBER.equals(wechatReceiveMsg.getType())){
+            //接收全部信息
+            LOGGER.info("消息日志:{}", msg);
+            System.out.println("微信中收到了消息:" + msg);
+            sheSay.sheTesting(wechatReceiveMsg);
             sheSay.sheReading(wechatReceiveMsg);
-        }
 
-        else if (!WechatBotCommon.HEART_BEAT.equals(wechatReceiveMsg.getType()) && wechatReceiveMsg.getWxid() != null) {
             //图灵测试
-            if (
-                    wechatReceiveMsg.getWxid().equals("24355601674@chatroom") //图灵测试
-                            || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21") //tom
 
-//                            || wechatReceiveMsg.getWxid().equals("18929140647@chatroom") //大群
+//            if (wechatReceiveMsg.getWxid().equals("24355601674@chatroom") //图灵测试
+//                            || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21") //tom
+//            ) {
+//                System.out.println("微信中收到了消息:" + msg);
+//            }
+
+
+            //运行环境
+
+            if (wechatReceiveMsg.getWxid().equals("24387124968@chatroom")//大群
+                    || wechatReceiveMsg.getWxid().equals("wxid_ary60w783fjn21") //tom
             ) {
-
-                System.out.println("微信中收到了消息:" + msg);
+//                System.out.println("微信中收到了消息:" + msg);
 
                 sheSay.sheReplying(wechatReceiveMsg);
             }
+
+
         }
     }
 

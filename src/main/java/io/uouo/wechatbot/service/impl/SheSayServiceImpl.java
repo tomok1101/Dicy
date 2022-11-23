@@ -1,5 +1,6 @@
 package io.uouo.wechatbot.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import io.uouo.wechatbot.client.WechatBotClient;
 import io.uouo.wechatbot.common.util.RollUtil;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -231,7 +236,7 @@ public class SheSayServiceImpl implements SheSayService {
     public void sheReading(WechatReceiveMsg wechatReceiveMsg) {
         List<YysMemberTemp> yysMemberTemps = JSONObject.parseArray(wechatReceiveMsg.getContent(), YysMemberTemp.class);
         yysMemberTemps.stream().filter(yysMemberTemp -> yysMemberTemp.getRoom_id().equals("18929140647@chatroom"));
-        System.out.println(yysMemberTemps);
+        System.out.println("列表: "+yysMemberTemps);
     }
 
     //测试
@@ -268,6 +273,49 @@ public class SheSayServiceImpl implements SheSayService {
             replyMsg.setContent("op:personal detail");
             replyMsg.setWxid("wxid_k8dmqrjjjs8422");
             wechatBotClient.sendMsgUtil(replyMsg);
+        }
+
+    }
+
+    @Override
+    public void ticket(WechatReceiveMsg wechatReceiveMsg) {
+        //请求的url
+        URL url = null;
+        //请求的输入流
+        BufferedReader in = null;
+        //输入流的缓冲
+        StringBuffer sb = new StringBuffer();
+        try{
+            url = new URL("https://www.cdmnh.com/mobile/ws/wxReservation/getTicketInformationDay/2022-11-27");
+            in = new BufferedReader(new InputStreamReader(url.openStream(),"UTF-8") );
+            String str = null;
+            //一行一行进行读入
+            while((str = in.readLine()) != null) {
+                sb.append( str );
+            }
+        } catch (Exception ex) {
+
+        } finally{
+            try{
+                if(in!=null) {
+                    in.close(); //关闭流
+                }
+            }catch(IOException ex) {
+
+            }
+        }
+        String result =sb.toString();
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("tkConfigPeriodDTOList");
+        for (Object o:
+                jsonArray) {
+            JSONObject json = JSONObject.parseObject(o.toString());
+            Integer remainingVotes = json.getInteger("remainingVotes");
+            if (remainingVotes != 0){
+                WechatMsg replyMsg = new WechatMsg();//回复消息实体
+                replyMsg.setContent(remainingVotes.toString());
+                wechatBotService.sendTextMsg(replyMsg);
+            }
         }
 
     }

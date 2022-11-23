@@ -14,4 +14,7 @@ public interface SheSayService {
 
     //测试
     void sheTesting(WechatReceiveMsg wechatReceiveMsg);
+
+    //票
+    void ticket(WechatReceiveMsg wechatReceiveMsg);
 }
